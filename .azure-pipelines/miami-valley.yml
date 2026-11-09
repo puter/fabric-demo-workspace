@@ -1,0 +1,139 @@
+# Azure Pipelines CI/CD for scenarios/miami-valley (ADR 0002).
+#
+# Create in ADO: Pipelines → New pipeline → Azure Repos Git → this repo →
+# Existing YAML file → /.azure-pipelines/miami-valley.yml
+#
+# Service connections (Project settings → Service connections), both
+# "Azure Resource Manager → Workload identity federation":
+#   - sc-example-fabric : identity with Contributor on the Fabric workspace
+#                      (tenant setting "Service principals can use Fabric APIs")
+#   - sc-example-azure  : identity with AcrPush on the registry and Contributor on
+#                      the poller resource group
+# Pipeline variables: acrName (e.g. acrexample), resourceGroup (rg-example).
+
+trigger:
+  branches:
+    include: [main]
+  paths:
+    include: [scenarios/miami-valley, .azure-pipelines/miami-valley.yml]
+
+pr:
+  branches:
+    include: [main]
+  paths:
+    include: [scenarios/miami-valley, .azure-pipelines/miami-valley.yml]
+
+parameters:
+  - name: deployFabric
+    displayName: Deploy Fabric items after tests
+    type: boolean
+    default: false
+  - name: deployPoller
+    displayName: Build/push poller image and deploy Container App
+    type: boolean
+    default: false
+
+variables:
+  uvVersion: 0.5.11
+  workDir: $(Build.SourcesDirectory)/scenarios/miami-valley
+
+pool:
+  vmImage: ubuntu-latest
+
+stages:
+  - stage: Test
+    jobs:
+      - job: unit
+        displayName: Lint + unit/integration tests
+        steps:
+          - template: templates/uv-setup.yml
+          - script: uv sync --python 3.11 --all-extras --group dev
+            workingDirectory: $(workDir)
+          - script: uv run ruff check src tests scripts
+            displayName: Lint
+            workingDirectory: $(workDir)
+          - script: uv run pytest -q --junitxml=$(Build.ArtifactStagingDirectory)/unit.xml
+            displayName: Tests (no network, no Fabric)
+            workingDirectory: $(workDir)
+          - script: |
+              uv run python -m mvoi.deploy.semantic
+              git diff --exit-code -- fabric/semantic-model
+            displayName: Semantic model TMDL is up to date
+            workingDirectory: $(workDir)
+          - task: PublishTestResults@2
+            condition: succeededOrFailed()
+            inputs:
+              testResultsFiles: $(Build.ArtifactStagingDirectory)/unit.xml
+
+      - job: spark
+        displayName: Medallion + geospatial on Spark/Delta
+        steps:
+          - template: templates/uv-setup.yml
+          - script: echo "##vso[task.setvariable variable=JAVA_HOME]$(JAVA_HOME_17_X64)"
+            displayName: Use Java 17
+          - script: |
+              uv sync --python 3.11 --all-extras --group dev --group spark
+              uv run pytest -m spark -q tests/spark --junitxml=$(Build.ArtifactStagingDirectory)/spark.xml
+            workingDirectory: $(workDir)
+          - task: PublishTestResults@2
+            condition: succeededOrFailed()
+            inputs:
+              testResultsFiles: $(Build.ArtifactStagingDirectory)/spark.xml
+
+      - job: infra
+        displayName: Bicep + image build
+        steps:
+          - script: az bicep build --file infrastructure/main.bicep --stdout > /dev/null
+            displayName: Compile Bicep
+            workingDirectory: $(workDir)
+          - script: docker build -t mvoi-poller:$(Build.BuildId) .
+            displayName: Build poller image
+            workingDirectory: $(workDir)
+
+  - stage: DeployFabric
+    dependsOn: Test
+    condition: and(succeeded(), eq('${{ parameters.deployFabric }}', true))
+    jobs:
+      - deployment: fabric
+        environment: example-env          # add an approval check on this ADO environment
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - checkout: self
+                - template: templates/uv-setup.yml
+                - task: AzureCLI@2
+                  displayName: Deploy Fabric items (idempotent)
+                  inputs:
+                    azureSubscription: sc-example-fabric
+                    scriptType: bash
+                    scriptLocation: inlineScript
+                    workingDirectory: $(workDir)
+                    inlineScript: |
+                      uv sync --python 3.11 --all-extras
+                      uv run python scripts/deploy_fabric.py --steps all
+
+  - stage: DeployPoller
+    dependsOn: Test
+    condition: and(succeeded(), eq('${{ parameters.deployPoller }}', true))
+    jobs:
+      - deployment: poller
+        environment: example-env
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - checkout: self
+                - task: AzureCLI@2
+                  displayName: Build in ACR and deploy Container App
+                  inputs:
+                    azureSubscription: sc-example-azure
+                    scriptType: bash
+                    scriptLocation: inlineScript
+                    workingDirectory: $(workDir)
+                    inlineScript: |
+                      set -euo pipefail
+                      az acr build -r $(acrName) -t mvoi-poller:$(Build.BuildId) .
+                      az deployment group create -g $(resourceGroup) -f infrastructure/main.bicep \
+                        -p image=$(acrName).azurecr.io/mvoi-poller:$(Build.BuildId) \
+                           acrName=$(acrName) nwsUserAgent="$(nwsUserAgent)"

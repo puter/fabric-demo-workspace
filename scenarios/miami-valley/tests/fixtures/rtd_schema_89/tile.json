@@ -1,0 +1,1562 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "/static/d/schema/89/tile.json",
+    "meta": { "schema_version": 89, "json_filename": "tile.json" },
+    "title": "Tiles schema",
+    "type": "object",
+    "properties": {
+        "tile": {
+            "type": "object",
+            "properties": {
+                "id": { "$ref": "dashboard.json#/$defs/uuid" },
+                "title": { "type": "string" },
+                "hideTitle": {
+                    "type": "boolean",
+                    "description": "If true, tile title will be hidden",
+                    "errorMessage": { "type": "\"tiles.hideTitle\" is expected to be a boolean (true or false)" }
+                },
+                "description": {
+                    "type": "string",
+                    "description": "The tile description",
+                    "errorMessage": { "type": "Expected to be a string" }
+                },
+                "insightPrompt": {
+                    "type": "object",
+                    "description": "Editor-authored custom AI insight prompt rendered inside the tile",
+                    "properties": {
+                        "enabled": {
+                            "type": "boolean",
+                            "description": "Whether the custom AI insight is shown on the tile",
+                            "errorMessage": {
+                                "type": "\"tiles.insightPrompt.enabled\" is expected to be a boolean (true or false)"
+                            }
+                        },
+                        "prompt": {
+                            "type": "string",
+                            "maxLength": 2000,
+                            "description": "The editor-authored natural-language prompt",
+                            "errorMessage": { "type": "Expected to be a string" }
+                        },
+                        "autoRefresh": {
+                            "type": "boolean",
+                            "description": "Whether to regenerate the insight when the tile data refreshes",
+                            "errorMessage": {
+                                "type": "\"tiles.insightPrompt.autoRefresh\" is expected to be a boolean (true or false)"
+                            }
+                        }
+                    },
+                    "required": ["enabled", "prompt"],
+                    "errorMessage": {
+                        "type": "`tiles.insightPrompt` expects to be an \"object\"",
+                        "required": "`tiles.insightPrompt` requires the following properties to be defined: [\"enabled\", \"prompt\"]"
+                    }
+                },
+                "layout": {
+                    "type": "object",
+                    "properties": {
+                        "x": {
+                            "type": "number",
+                            "description": "The x position of the tile",
+                            "minimum": 0,
+                            "examples": [0],
+                            "errorMessage": { "type": "\"tiles.layout.x\" is expected to be a number >= 0" }
+                        },
+                        "y": {
+                            "type": "number",
+                            "description": "The y position of the tile",
+                            "minimum": 0,
+                            "examples": [1],
+                            "errorMessage": { "type": "\"tiles.layout.y\" is expected to be a number >= 0" }
+                        },
+                        "width": {
+                            "type": "number",
+                            "description": "How wide the tile is",
+                            "minimum": 2,
+                            "examples": [4],
+                            "errorMessage": { "type": "\"tiles.layout.width\" is expected to be a number >= 2" }
+                        },
+                        "height": {
+                            "type": "number",
+                            "description": "How tall the tile is",
+                            "minimum": 1,
+                            "examples": [6],
+                            "errorMessage": { "type": "\"tiles.layout.height\" is expected to be a number >= 1" }
+                        }
+                    },
+                    "required": ["x", "y", "width", "height"],
+                    "errorMessage": {
+                        "type": "`tiles.layout` needs to be an object with the following properties: [\"x\", \"y\", \"width\", \"height\"]",
+                        "required": "`tiles.layout` requires all the following properties to be defined: [\"x\", \"y\", \"width\", \"height\"]"
+                    }
+                },
+                "pageId": { "$ref": "dashboard.json#/$defs/uuid" },
+                "visualType": {
+                    "type": "string",
+                    "description": "The type of visual used for the tile (e.g. `line` or `pie`, etc.)",
+                    "errorMessage": { "type": "Expected to be a string" }
+                },
+                "visualOptions": {
+                    "type": "object",
+                    "description": "Visual options for the tile",
+                    "errorMessage": { "type": "`tiles.visualOptions` expects to be an \"object\"" },
+                    "properties": {
+                        "agent__prompt": {
+                            "type": "string",
+                            "maxLength": 2000,
+                            "description": "The natural-language prompt run by the AI Agent tile.",
+                            "errorMessage": { "type": "Expected to be a string" }
+                        },
+                        "agent__contextTileIds": {
+                            "type": "array",
+                            "description": "The dashboard tile ids provided as context to the AI Agent tile.",
+                            "items": { "type": "string" },
+                            "errorMessage": {
+                                "type": "\"tiles.visualOptions.agent__contextTileIds\" is expected to be an array of: string"
+                            }
+                        },
+                        "agent__autoRefreshEnabled": {
+                            "type": "boolean",
+                            "description": "Whether automatic refresh is enabled for the AI Agent tile.",
+                            "errorMessage": {
+                                "type": "\"tiles.visualOptions.agent__autoRefreshEnabled\" is expected to be a boolean (true or false)"
+                            }
+                        },
+                        "designTile__kind": {
+                            "type": "string",
+                            "description": "The kind of design tile to render.",
+                            "enum": ["title", "divider", "textBox"],
+                            "errorMessage": {
+                                "type": "\"tiles.visualOptions.designTile__kind\" is an Enum and expects one of the following values: [\"title\", \"divider\", \"textBox\"]"
+                            }
+                        },
+                        "designTile__showBorder": {
+                            "type": "boolean",
+                            "description": "Whether the design tile border is shown.",
+                            "errorMessage": {
+                                "type": "\"tiles.visualOptions.designTile__showBorder\" is expected to be a boolean (true or false)"
+                            }
+                        },
+                        "designTile__bgColor": {
+                            "type": ["string", "null"],
+                            "nullable": true,
+                            "description": "The design tile background color, as a color--(index) palette reference. Null leaves the tile transparent.",
+                            "errorMessage": {
+                                "type": "\"tiles.visualOptions.designTile__bgColor\" is expected to be one of: [\"string\", \"null\"]"
+                            }
+                        },
+                        "designTile__fontSize": {
+                            "type": "number",
+                            "description": "The design tile font size.",
+                            "errorMessage": {
+                                "type": "\"tiles.visualOptions.designTile__fontSize\" is expected to be a number"
+                            }
+                        },
+                        "designTile__bold": {
+                            "type": "boolean",
+                            "description": "Whether the design tile text is bold.",
+                            "errorMessage": {
+                                "type": "\"tiles.visualOptions.designTile__bold\" is expected to be a boolean (true or false)"
+                            }
+                        },
+                        "designTile__italic": {
+                            "type": "boolean",
+                            "description": "Whether the design tile text is italic.",
+                            "errorMessage": {
+                                "type": "\"tiles.visualOptions.designTile__italic\" is expected to be a boolean (true or false)"
+                            }
+                        },
+                        "designTile__underline": {
+                            "type": "boolean",
+                            "description": "Whether the design tile text is underlined.",
+                            "errorMessage": {
+                                "type": "\"tiles.visualOptions.designTile__underline\" is expected to be a boolean (true or false)"
+                            }
+                        },
+                        "designTile__align": {
+                            "type": "string",
+                            "description": "The design tile content alignment.",
+                            "enum": ["left", "center", "right"],
+                            "errorMessage": {
+                                "type": "\"tiles.visualOptions.designTile__align\" is an Enum and expects one of the following values: [\"left\", \"center\", \"right\"]"
+                            }
+                        },
+                        "title__text": {
+                            "type": "string",
+                            "description": "The title design tile text.",
+                            "errorMessage": { "type": "Expected to be a string" }
+                        },
+                        "title__textColor": {
+                            "type": ["string", "null"],
+                            "nullable": true,
+                            "description": "The title design tile text color, as a color--(index) palette reference. Null uses the default.",
+                            "errorMessage": {
+                                "type": "\"tiles.visualOptions.title__textColor\" is expected to be one of: [\"string\", \"null\"]"
+                            }
+                        },
+                        "divider__label": {
+                            "type": "string",
+                            "description": "The divider design tile label.",
+                            "errorMessage": { "type": "Expected to be a string" }
+                        },
+                        "divider__lineColor": {
+                            "type": ["string", "null"],
+                            "nullable": true,
+                            "description": "The divider design tile line color, as a color--(index) palette reference. Null uses the default.",
+                            "errorMessage": {
+                                "type": "\"tiles.visualOptions.divider__lineColor\" is expected to be one of: [\"string\", \"null\"]"
+                            }
+                        },
+                        "divider__lineStyle": {
+                            "type": "string",
+                            "description": "The divider design tile line style.",
+                            "enum": ["solid", "dashed", "dotted"],
+                            "errorMessage": {
+                                "type": "\"tiles.visualOptions.divider__lineStyle\" is an Enum and expects one of the following values: [\"solid\", \"dashed\", \"dotted\"]"
+                            }
+                        },
+                        "textBox__html": {
+                            "type": "string",
+                            "maxLength": 262144,
+                            "description": "The text box design tile HTML content. Up to 262,144 characters.",
+                            "errorMessage": { "type": "Expected to be a string" }
+                        },
+                        "visualBuilder__html": {
+                            "type": "string",
+                            "maxLength": 262144,
+                            "description": "AI Visual Builder: HTML payload rendered inside a sandboxed iframe with a CSP envelope injected at render time. Up to 256 KB.",
+                            "errorMessage": { "type": "Expected to be a string" }
+                        },
+                        "colorRulesDisabled": {
+                            "type": "boolean",
+                            "description": "Is the color rules disabled?",
+                            "errorMessage": {
+                                "type": "\"tiles.visualOptions.colorRulesDisabled\" is expected to be a boolean (true or false)"
+                            }
+                        },
+                        "crossFilter": {
+                            "type": "array",
+                            "description": "Cross-filtering for the tile",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "interaction": {
+                                        "type": "string",
+                                        "description": "The interaction of the dimension",
+                                        "examples": ["column"],
+                                        "errorMessage": { "type": "Expected to be a string" }
+                                    },
+                                    "property": {
+                                        "type": "string",
+                                        "description": "The property of the dimension",
+                                        "examples": ["timestamp"],
+                                        "errorMessage": { "type": "Expected to be a string" }
+                                    },
+                                    "parameterId": { "$ref": "dashboard.json#/$defs/uuid" },
+                                    "disabled": {
+                                        "type": "boolean",
+                                        "errorMessage": {
+                                            "type": "\"tiles.visualOptions.crossFilter.disabled\" is expected to be a boolean (true or false)"
+                                        }
+                                    }
+                                },
+                                "errorMessage": {
+                                    "type": "\"tiles.visualOptions.crossFilter\" is expected to be a object"
+                                }
+                            },
+                            "examples": [
+                                [
+                                    {
+                                        "interaction": "column",
+                                        "property": "timestamp",
+                                        "parameterId": "55743aeb-468f-4db3-aa26-4c4b298f0353"
+                                    }
+                                ]
+                            ]
+                        },
+                        "colorRules": {
+                            "type": "array",
+                            "description": "Rules for coloring parts of the visual. For example, you might color a row red if a value in it is below 50.",
+                            "items": { "$ref": "#/$defs/colorRule" }
+                        },
+                        "crossFilterDisabled": {
+                            "type": "boolean",
+                            "description": "Is cross-filter disabled?",
+                            "errorMessage": {
+                                "type": "\"tiles.visualOptions.crossFilterDisabled\" is expected to be a boolean (true or false)"
+                            }
+                        },
+                        "colorStyle": { "enum": ["light", "bold"] },
+                        "drillthrough": {
+                            "type": "array",
+                            "description": "Drillthrough for the tile",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "pairs": {
+                                        "type": "array",
+                                        "description": "An array of property and parameterId pairs for this specific drillthrough",
+                                        "items": {
+                                            "type": "object",
+                                            "properties": {
+                                                "property": {
+                                                    "type": "string",
+                                                    "description": "The property of the dimension",
+                                                    "examples": ["timestamp"],
+                                                    "errorMessage": { "type": "Expected to be a string" }
+                                                },
+                                                "parameterId": { "$ref": "dashboard.json#/$defs/uuid" }
+                                            }
+                                        },
+                                        "examples": [
+                                            [
+                                                {
+                                                    "property": "startTime",
+                                                    "parameterId": "55743aeb-468f-4db3-aa26-4c4b298f0353"
+                                                },
+                                                {
+                                                    "property": "birthMonth",
+                                                    "parameterId": "11453aeb-468f-4db3-aa26-4c4b298f9857"
+                                                }
+                                            ]
+                                        ]
+                                    },
+                                    "destinationPages": {
+                                        "type": "array",
+                                        "description": "An array of page IDs that are destinations for the drillthrough.",
+                                        "items": { "type": "string", "format": "uuid" },
+                                        "uniqueItems": true,
+                                        "errorMessage": {
+                                            "format": "Needs to follow the UUID format as defined by RFC 4122 (https://datatracker.ietf.org/doc/html/rfc4122). Example: 3e4666bf-d5e5-4aa7-b8ce-cefe41c7568a"
+                                        }
+                                    },
+                                    "notes": {
+                                        "type": "string",
+                                        "description": "Any notes you would like to associate with the drill through config.",
+                                        "errorMessage": { "type": "Expected to be a string" }
+                                    },
+                                    "disabled": {
+                                        "type": "boolean",
+                                        "errorMessage": {
+                                            "type": "\"tiles.visualOptions.drillthrough.disabled\" is expected to be a boolean (true or false)"
+                                        }
+                                    }
+                                },
+                                "errorMessage": {
+                                    "type": "\"tiles.visualOptions.drillthrough\" is expected to be a object"
+                                }
+                            },
+                            "examples": [
+                                [
+                                    {
+                                        "notes": "Date drillthrough",
+                                        "pairs": [
+                                            {
+                                                "property": "startTime",
+                                                "parameterId": "55743aeb-468f-4db3-aa26-4c4b298f0353"
+                                            },
+                                            {
+                                                "property": "birthMonth",
+                                                "parameterId": "11453aeb-468f-4db3-aa26-4c4b298f9857"
+                                            }
+                                        ],
+                                        "destinationPages": {
+                                            "kind": "selection",
+                                            "pageIds": [
+                                                "99993aeb-898b-3zb3-aa26-4c4b298f8867",
+                                                "15789aeb-818b-3zb0-re26-4c4b298z5567"
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "notes": "Date drillthrough",
+                                        "pairs": [
+                                            {
+                                                "property": "startTime",
+                                                "parameterId": "55743aeb-468f-4db3-aa26-4c4b298f0353"
+                                            },
+                                            {
+                                                "property": "birthMonth",
+                                                "parameterId": "11453aeb-468f-4db3-aa26-4c4b298f9857"
+                                            }
+                                        ],
+                                        "destinationPages": { "kind": "all" }
+                                    }
+                                ]
+                            ]
+                        },
+                        "drillthroughDisabled": {
+                            "type": "boolean",
+                            "description": "Is drillthrough disabled?",
+                            "errorMessage": {
+                                "type": "\"tiles.visualOptions.drillthroughDisabled\" is expected to be a boolean (true or false)"
+                            }
+                        },
+                        "embeddedApp__ref": {
+                            "$ref": "dashboard.json#/$defs/uuid",
+                            "description": "Reference to an embedded app entity by id"
+                        },
+                        "embeddedApp__renderingOptions": {
+                            "type": "string",
+                            "description": "Embedded app rendering options",
+                            "errorMessage": { "type": "Expected to be a string" }
+                        },
+                        "fabricMap": {
+                            "type": "object",
+                            "description": "Fabric Map configuration for the embedded Fabric Map artifact (item)",
+                            "properties": {
+                                "artifactId": {
+                                    "type": "string",
+                                    "description": "The Fabric Map artifact (item) id that is embedded by the tile",
+                                    "errorMessage": { "type": "Expected to be a string" }
+                                },
+                                "workspaceId": {
+                                    "type": "string",
+                                    "description": "The Fabric workspace id that the embedded Fabric Map artifact belongs to",
+                                    "errorMessage": { "type": "Expected to be a string" }
+                                }
+                            },
+                            "errorMessage": { "type": "\"tiles.visualOptions.fabricMap\" is expected to be a object" }
+                        },
+                        "heatMap__dataColumn": {
+                            "type": ["string", "null"],
+                            "nullable": true,
+                            "description": "heat map - data column"
+                        },
+                        "heatMap__colorPaletteKey": {
+                            "description": "Color palette theme key used against the heat map visual",
+                            "enum": ["blue", "green", "purple", "orange", "pink", "yellow"]
+                        },
+                        "hideDataLabels": {
+                            "type": "boolean",
+                            "description": "Are the data labels hidden?",
+                            "errorMessage": {
+                                "type": "\"tiles.visualOptions.hideDataLabels\" is expected to be a boolean (true or false)"
+                            }
+                        },
+                        "hideLegend": {
+                            "type": "boolean",
+                            "description": "Is this legend hidden?",
+                            "errorMessage": {
+                                "type": "\"tiles.visualOptions.hideLegend\" is expected to be a boolean (true or false)"
+                            }
+                        },
+                        "horizontalLine": {
+                            "type": "string",
+                            "description": "horizontal line",
+                            "errorMessage": { "type": "Expected to be a string" }
+                        },
+                        "legendLocation": {
+                            "type": "string",
+                            "description": "The location the legend is positioned",
+                            "enum": ["bottom", "left", "right"],
+                            "errorMessage": {
+                                "type": "\"tiles.visualOptions.legendLocation\" is an Enum and expects one of the following values: [\"bottom\", \"left\", \"right\"]"
+                            }
+                        },
+                        "line__hidePinpointTooltips": {
+                            "type": "boolean",
+                            "description": "Should show/hide line specific indications (pinpoint) on the line",
+                            "errorMessage": {
+                                "type": "\"tiles.visualOptions.line__hidePinpointTooltips\" is expected to be a boolean (true or false)"
+                            }
+                        },
+                        "map__type": { "enum": ["bubble"] },
+                        "map__bubbleFormat": {
+                            "type": "string",
+                            "description": "The type of map bubble",
+                            "enum": ["dot", "bubble", "heatmap", "pieChart"],
+                            "errorMessage": {
+                                "type": "\"tiles.visualOptions.map__bubbleFormat\" is an Enum and expects one of the following values: [\"dot\", \"bubble\", \"heatmap\", \"pieChart\"]"
+                            }
+                        },
+                        "map__latitudeColumn": {
+                            "type": ["string", "null"],
+                            "nullable": true,
+                            "description": "The latitude column"
+                        },
+                        "map__longitudeColumn": {
+                            "type": ["string", "null"],
+                            "nullable": true,
+                            "description": "The longitude column"
+                        },
+                        "map__minBubbleSizeColumn": {
+                            "type": ["string", "null"],
+                            "nullable": true,
+                            "description": "The minimum bubble size per column"
+                        },
+                        "map__labelColumn": { "type": ["string", "null"], "nullable": true },
+                        "map__sizeColumn": { "type": ["string", "null"], "nullable": true },
+                        "map__sizeDisabled": { "type": "boolean" },
+                        "map__geoType": { "enum": ["infer", "geoPoint", "numeric"] },
+                        "map__geoPointColumn": { "type": ["string", "null"], "nullable": true },
+                        "multiStat__displayOrientation": {
+                            "type": "string",
+                            "description": "The orientation of the multi stat tile. Vertical = single column. Horizontal = single row.",
+                            "enum": ["vertical", "horizontal"],
+                            "errorMessage": {
+                                "type": "\"tiles.visualOptions.multiStat__displayOrientation\" is an Enum and expects one of the following values: [\"vertical\", \"horizontal\"]"
+                            }
+                        },
+                        "multiStat__labelColumn": {
+                            "type": ["string", "null"],
+                            "nullable": true,
+                            "description": "The label column"
+                        },
+                        "multiStat__slot": {
+                            "type": "object",
+                            "properties": {
+                                "height": {
+                                    "type": "number",
+                                    "description": "The height of the multi stat",
+                                    "errorMessage": {
+                                        "type": "\"tiles.visualOptions.multiStat__slot.height\" is expected to be a number"
+                                    }
+                                },
+                                "width": {
+                                    "type": "number",
+                                    "description": "The width of the multi stat",
+                                    "errorMessage": {
+                                        "type": "\"tiles.visualOptions.multiStat__slot.width\" is expected to be a number"
+                                    }
+                                }
+                            },
+                            "required": ["height", "width"],
+                            "errorMessage": {
+                                "required": "\"tiles.visualOptions.multiStat__slot\" requires the following properties to be defined: [\"height\", \"width\"]"
+                            }
+                        },
+                        "multiStat__textSize": {
+                            "type": "string",
+                            "description": "The text size for multi stat",
+                            "enum": ["auto", "large", "small"],
+                            "errorMessage": {
+                                "type": "\"tiles.visualOptions.multiStat__textSize\" is an Enum and expects one of the following values: [\"auto\", \"large\", \"small\"]"
+                            }
+                        },
+                        "multiStat__valueColumn": {
+                            "type": ["string", "null"],
+                            "nullable": true,
+                            "description": "The value column"
+                        },
+                        "multipleYAxes": {
+                            "type": "object",
+                            "properties": {
+                                "base": {
+                                    "type": "object",
+                                    "description": "The base y-axis config",
+                                    "properties": {
+                                        "id": {
+                                            "anyOf": [
+                                                { "type": "string", "const": "-1" },
+                                                { "type": "string", "format": "uuid" }
+                                            ],
+                                            "description": "The id for the axes",
+                                            "errorMessage": { "type": "Expected to be a string" }
+                                        },
+                                        "columns": {
+                                            "type": "array",
+                                            "description": "`columns` property is only for the multiple y axes. For the base y axis this property is empty array.",
+                                            "items": { "type": "string" },
+                                            "errorMessage": { "type": "Expected to be an array of strings" },
+                                            "default": []
+                                        },
+                                        "label": {
+                                            "type": "string",
+                                            "description": "The label for the axes",
+                                            "errorMessage": { "type": "Expected to be a string" }
+                                        },
+                                        "yAxisMinimumValue": {
+                                            "type": ["number", "null"],
+                                            "nullable": true,
+                                            "description": "The minimum value. Can be \"null\"",
+                                            "errorMessage": {
+                                                "type": "\"tiles.visualOptions.multipleYAxes.base.yAxisMinimumValue\" is expected to be one of: [\"number\", \"null\"]"
+                                            }
+                                        },
+                                        "yAxisMaximumValue": {
+                                            "type": ["number", "null"],
+                                            "nullable": true,
+                                            "description": "The maximum value",
+                                            "errorMessage": {
+                                                "type": "\"tiles.visualOptions.multipleYAxes.base.yAxisMaximumValue\" is expected to be one of: [\"number\", \"null\"]"
+                                            }
+                                        },
+                                        "yAxisScale": {
+                                            "type": "string",
+                                            "description": "The type of axis scale (e.g. `linear` or `log`)",
+                                            "enum": ["linear", "log"],
+                                            "errorMessage": {
+                                                "type": "\"tiles.visualOptions.multipleYAxes.base.yAxisMaximumValue\" is an Enum and expects one of the following values: [\"linear\", \"log\"]"
+                                            }
+                                        },
+                                        "horizontalLines": {
+                                            "type": "array",
+                                            "description": "An array of horizontal lines",
+                                            "items": {
+                                                "type": "object",
+                                                "required": ["id", "value"],
+                                                "properties": {
+                                                    "id": { "$ref": "dashboard.json#/$defs/uuid" },
+                                                    "value": {
+                                                        "type": ["number", "null"],
+                                                        "nullable": true,
+                                                        "description": "The value for the horizontal line",
+                                                        "errorMessage": {
+                                                            "type": "\"tiles.visualOptions.multipleYAxes.base.horizontalLines.value\" is expected to be one of: \"number\" or \"null\""
+                                                        }
+                                                    }
+                                                }
+                                            },
+                                            "errorMessage": {
+                                                "type": "\"tiles.visualOptions.multipleYAxes.base.horizontalLines\" is expected to be an array of: { id: string; value: number | null }"
+                                            }
+                                        }
+                                    },
+                                    "required": [
+                                        "id",
+                                        "columns",
+                                        "label",
+                                        "yAxisMinimumValue",
+                                        "yAxisMaximumValue",
+                                        "yAxisScale",
+                                        "horizontalLines"
+                                    ],
+                                    "errorMessage": {
+                                        "required": "\"tiles.visualOptions.multipleYAxes.base\" requires the following properties to be defined: [\"id\", \"columns\", \"label\", \"yAxisMinimumValue\", \"yAxisMaximumValue\", \"yAxisScale\", \"horizontalLine\", \"horizontalLines\"]"
+                                    }
+                                },
+                                "additional": {
+                                    "type": "array",
+                                    "description": "The additional y-axis config",
+                                    "items": {
+                                        "type": "object",
+                                        "properties": {
+                                            "id": {
+                                                "anyOf": [
+                                                    { "type": "string", "const": "-1" },
+                                                    { "type": "string", "format": "uuid" }
+                                                ],
+                                                "description": "The id for the axes",
+                                                "errorMessage": { "type": "Expected to be a string" }
+                                            },
+                                            "columns": {
+                                                "type": "array",
+                                                "description": "`columns` property is only for the multiple y axes. For the additional y axis this property is empty array.",
+                                                "items": { "type": "string" },
+                                                "errorMessage": { "type": "Expected to be an array of strings" },
+                                                "default": []
+                                            },
+                                            "label": {
+                                                "type": "string",
+                                                "description": "The label for the axes",
+                                                "errorMessage": { "type": "Expected to be a string" }
+                                            },
+                                            "yAxisMinimumValue": {
+                                                "type": ["number", "null"],
+                                                "nullable": true,
+                                                "description": "The minimum value. Can be \"null\"",
+                                                "errorMessage": {
+                                                    "type": "\"tiles.visualOptions.multipleYAxes.additional.yAxisMinimumValue\" is expected to be one of: [\"number\", \"null\"]"
+                                                }
+                                            },
+                                            "yAxisMaximumValue": {
+                                                "type": ["number", "null"],
+                                                "nullable": true,
+                                                "description": "The maximum value",
+                                                "errorMessage": {
+                                                    "type": "\"tiles.visualOptions.multipleYAxes.additional.yAxisMaximumValue\" is expected to be one of: [\"number\", \"null\"]"
+                                                }
+                                            },
+                                            "yAxisScale": {
+                                                "type": "string",
+                                                "description": "The type of axis scale (e.g. `linear` or `log`)",
+                                                "enum": ["linear", "log"],
+                                                "errorMessage": {
+                                                    "type": "\"tiles.visualOptions.multipleYAxes.additional.yAxisMaximumValue\" is an Enum and expects one of the following values: [\"linear\", \"log\"]"
+                                                }
+                                            },
+                                            "horizontalLines": {
+                                                "type": "array",
+                                                "description": "An array of horizontal lines",
+                                                "items": {
+                                                    "type": "object",
+                                                    "required": ["id", "value"],
+                                                    "properties": {
+                                                        "id": { "$ref": "dashboard.json#/$defs/uuid" },
+                                                        "value": {
+                                                            "type": ["number", "null"],
+                                                            "nullable": true,
+                                                            "description": "The value for the horizontal line",
+                                                            "errorMessage": {
+                                                                "type": "\"tiles.visualOptions.multipleYAxes.additional.horizontalLines.value\" is expected to be one of: \"number\" or \"null\""
+                                                            }
+                                                        }
+                                                    }
+                                                },
+                                                "errorMessage": {
+                                                    "type": "\"tiles.visualOptions.multipleYAxes.additional.horizontalLines\" is expected to be an array of: { id: string; value: number | null }"
+                                                }
+                                            }
+                                        },
+                                        "required": [
+                                            "id",
+                                            "columns",
+                                            "label",
+                                            "yAxisMinimumValue",
+                                            "yAxisMaximumValue",
+                                            "yAxisScale",
+                                            "horizontalLines"
+                                        ],
+                                        "errorMessage": {
+                                            "required": "\"tiles.visualOptions.multipleYAxes.additional\" requires the following properties to be defined: [\"id\", \"columns\", \"label\", \"yAxisMinimumValue\", \"yAxisMaximumValue\", \"yAxisScale\", \"horizontalLines\"]"
+                                        }
+                                    }
+                                },
+                                "showMultiplePanels": {
+                                    "type": "boolean",
+                                    "description": "Show each additional Y-Axis in a separate panel",
+                                    "errorMessage": {
+                                        "type": "\"tiles.visualOptions.multipleYAxes.showMultiplePanels\" is expected to be a boolean (true or false)"
+                                    }
+                                }
+                            },
+                            "required": ["additional", "base", "showMultiplePanels"],
+                            "errorMessage": {
+                                "required": "\"tiles.visualOptions.multipleYAxes.additional\" requires the following properties to be defined: [\"additional\", \"base\"]"
+                            }
+                        },
+                        "seriesColors": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string",
+                                "pattern": "^rgba\\((\\s*\\d{1,3}\\s*,){3}\\s*(0|0?\\.\\d+|1)\\s*\\)$|^color--\\(([0-9]|1[0-9]|2[0-8])\\)$",
+                                "errorMessage": "Each value in \"tiles.visualOptions.seriesColors\" must be a HEX color, an RGBA string, or a valid color scheme value."
+                            }
+                        },
+                        "selectedDataOnLoad": {
+                            "type": "object",
+                            "properties": {
+                                "all": {
+                                    "type": "boolean",
+                                    "description": "Select all series data on load",
+                                    "errorMessage": {
+                                        "type": "\"tiles.visualOptions.selectedDataOnLoad.all\" is expected to be a boolean (true or false)"
+                                    }
+                                },
+                                "limit": {
+                                    "type": "integer",
+                                    "minimum": 1,
+                                    "maximum": 999999,
+                                    "description": "Number of selected series data on load",
+                                    "errorMessage": {
+                                        "type": "\"tiles.visualOptions.selectedDataOnLoad.limit\" is expected to be an integer between 1 and 999999"
+                                    }
+                                }
+                            }
+                        },
+                        "dataPointsTooltip": {
+                            "type": "object",
+                            "properties": {
+                                "all": {
+                                    "type": "boolean",
+                                    "description": "Show all data points inside a tooltip",
+                                    "errorMessage": {
+                                        "type": "\"tiles.visualOptions.dataPointsTooltip.all\" is expected to be a boolean (true or false)"
+                                    }
+                                },
+                                "limit": {
+                                    "type": "integer",
+                                    "minimum": 1,
+                                    "maximum": 999999,
+                                    "description": "Number of data points to show in a tooltip",
+                                    "errorMessage": {
+                                        "type": "\"tiles.visualOptions.dataPointsTooltip.limit\" is expected to be an integer between 1 and 999999"
+                                    }
+                                }
+                            }
+                        },
+                        "seriesColumns": {
+                            "type": ["array", "null"],
+                            "nullable": true,
+                            "items": { "type": "string" },
+                            "description": "The columns used for the series"
+                        },
+                        "table__enableRenderLinks": {
+                            "type": "boolean",
+                            "description": "Should we render clickable links in table columns if the text is a valid URL?",
+                            "errorMessage": {
+                                "type": "\"tiles.visualOptions.table__enableRenderLinks\" is expected to be a boolean (true or false)"
+                            }
+                        },
+                        "table__renderLinks": {
+                            "type": "array",
+                            "description": "An array of column pairs to render links for",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "urlColumn": {
+                                        "type": "string",
+                                        "description": "The column we treat as the URL for the link (e.g. https://microsoft.com)."
+                                    },
+                                    "displayColumn": {
+                                        "type": "string",
+                                        "description": "Optional. When defined as a `string`, we wrap the `displayColumn` with the link from `urlColumn`. When missing, we render the link defined on `urlColumn`."
+                                    },
+                                    "disabled": {
+                                        "type": "boolean",
+                                        "description": "This specific render link pair is disabled and not applied to the table visual."
+                                    }
+                                },
+                                "required": ["urlColumn", "disabled"]
+                            },
+                            "errorMessage": {
+                                "type": "\"tiles.visualOptions.table__renderLinks\" is expected to be an array of: object"
+                            }
+                        },
+                        "verticalLine": {
+                            "type": "string",
+                            "description": "vertical line",
+                            "errorMessage": { "type": "Expected to be a string" }
+                        },
+                        "xAxisScale": {
+                            "type": "string",
+                            "description": "The type of scale used for the x-axis",
+                            "enum": ["linear", "log"],
+                            "errorMessage": {
+                                "type": "\"tiles.visualOptions.xAxisScale\" is an Enum and expects one of the following values: [\"linear\", \"log\"]"
+                            }
+                        },
+                        "xColumn": { "type": ["string", "null"], "nullable": true, "description": "The x column" },
+                        "xColumnTitle": {
+                            "type": "string",
+                            "description": "The column title for the x-axis",
+                            "errorMessage": { "type": "Expected to be a string" }
+                        },
+                        "yAxisMaximumValue": {
+                            "type": ["number", "null"],
+                            "nullable": true,
+                            "description": "The y-axis maximum value"
+                        },
+                        "yAxisMinimumValue": {
+                            "type": ["number", "null"],
+                            "nullable": true,
+                            "description": "The y-axis minimum value"
+                        },
+                        "yAxisRight": {
+                            "type": "boolean",
+                            "description": "Is the y-axis positioned on the right?",
+                            "errorMessage": {
+                                "type": "\"tiles.visualOptions.yAxisRight\" is expected to be a boolean (true or false)"
+                            }
+                        },
+                        "yAxisScale": {
+                            "type": "string",
+                            "description": "The type of scale used for the y-axis",
+                            "enum": ["linear", "log"],
+                            "errorMessage": {
+                                "type": "\"tiles.visualOptions.yAxisScale\" is an Enum and expects one of the following values: [\"linear\", \"log\"]"
+                            }
+                        },
+                        "yColumn": { "type": ["string", "null"], "nullable": true, "description": "The y column" },
+                        "yColumnTitle": {
+                            "type": "string",
+                            "description": "The column title for the y-axis",
+                            "errorMessage": { "type": "Expected to be a string" }
+                        },
+                        "yColumns": {
+                            "type": ["array", "null"],
+                            "nullable": true,
+                            "items": { "type": "string" },
+                            "description": "The y columns"
+                        },
+                        "anomalyColumns": {
+                            "type": ["array", "null"],
+                            "nullable": true,
+                            "items": { "type": "string" }
+                        },
+                        "labelDisabled": {
+                            "type": "boolean",
+                            "description": "Disable/Enable the label display options"
+                        },
+                        "tooltipDisabled": {
+                            "type": "boolean",
+                            "description": "Disable/Enable the tooltip display options"
+                        },
+                        "pie__label": {
+                            "type": "array",
+                            "description": "Label display options for the pie chart",
+                            "items": { "type": "string", "enum": ["name", "percentage", "value"] }
+                        },
+                        "pie__tooltip": {
+                            "type": "array",
+                            "description": "Tooltip display options for the pie chart",
+                            "items": { "type": "string", "enum": ["name", "percentage", "value"] }
+                        },
+                        "pie__orderBy": {
+                            "type": "string",
+                            "description": "Order by display options for the pie chart",
+                            "enum": ["none", "name", "size"]
+                        },
+                        "pie__kind": {
+                            "type": "string",
+                            "description": "Kind of the pie chart - pie or donut",
+                            "enum": ["pie", "donut"]
+                        },
+                        "pie__topNSlices": { "type": ["number", "null"], "nullable": true },
+                        "plotly__version": {
+                            "type": "string",
+                            "description": "The major version of PlotlyJS the visual is rendered with",
+                            "enum": ["2"]
+                        },
+                        "imageAllowlist": {
+                            "type": "string",
+                            "description": "Only images in this allowlist will be rendered by visuals. semicolon (;) separated",
+                            "examples": ["https://contoso.com;https://azure.com/kusto.jpg"]
+                        },
+                        "forceAxisTicks": { "type": "boolean", "description": "Show all labels of x axis" },
+                        "timeSeries__timeDataSource": {
+                            "type": ["string", "null"],
+                            "nullable": true,
+                            "description": "The column name that contains the timestamp data for the time series. If null, the system will attempt to infer the time column."
+                        },
+                        "timeSeries__allowPanAndZoom": {
+                            "type": "boolean",
+                            "description": "Whether pan and zoom interactions are allowed on the time series chart."
+                        },
+                        "timeSeries__initialZoom": {
+                            "type": ["object", "null"],
+                            "nullable": true,
+                            "description": "Initial zoom configuration for the time series chart. If null, defaults to full zoom.",
+                            "properties": {
+                                "partial": {
+                                    "type": "boolean",
+                                    "description": "Whether to use partial zoom. false = full timeline, true = zoom to timeRange."
+                                },
+                                "timeRange": {
+                                    "type": "number",
+                                    "description": "Duration in milliseconds for partial zoom. Only applicable when partial is true."
+                                }
+                            },
+                            "required": ["partial"]
+                        },
+                        "timeSeries__measuredEntities": {
+                            "type": "array",
+                            "description": "Array of measured entity configurations representing the hierarchy, ordered from root (index 0) to leaf (last index).",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "column": {
+                                        "type": "string",
+                                        "description": "The column name for this level of the entity hierarchy."
+                                    }
+                                },
+                                "required": ["column"]
+                            }
+                        },
+                        "timeSeries__measuredData": {
+                            "type": ["array", "null"],
+                            "nullable": true,
+                            "description": "Array of measured data column configurations.",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "id": {
+                                        "type": "string",
+                                        "description": "The data column name (used as identifier)."
+                                    },
+                                    "columns": {
+                                        "type": "array",
+                                        "items": { "type": "string" },
+                                        "description": "Columns property inherited from YAxisConfig. Left empty for time series."
+                                    },
+                                    "label": {
+                                        "type": "string",
+                                        "description": "Display name override. Empty string means use column name as-is."
+                                    },
+                                    "yAxisMinimumValue": {
+                                        "type": ["number", "null"],
+                                        "nullable": true,
+                                        "description": "Y-axis minimum value. Null means derived from data."
+                                    },
+                                    "yAxisMaximumValue": {
+                                        "type": ["number", "null"],
+                                        "nullable": true,
+                                        "description": "Y-axis maximum value. Null means derived from data."
+                                    },
+                                    "yAxisScale": {
+                                        "type": "string",
+                                        "enum": ["linear", "log"],
+                                        "description": "Y-axis scale type."
+                                    },
+                                    "horizontalLines": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "object",
+                                            "required": ["id", "value"],
+                                            "properties": {
+                                                "id": { "$ref": "dashboard.json#/$defs/uuid" },
+                                                "value": { "type": ["number", "null"], "nullable": true }
+                                            }
+                                        }
+                                    },
+                                    "defaultVisibility": {
+                                        "type": "boolean",
+                                        "description": "Whether this measure is visible by default."
+                                    },
+                                    "chartFormat": {
+                                        "type": "string",
+                                        "enum": ["line", "column"],
+                                        "description": "Chart rendering format for this measure."
+                                    }
+                                },
+                                "required": [
+                                    "id",
+                                    "columns",
+                                    "label",
+                                    "yAxisMinimumValue",
+                                    "yAxisMaximumValue",
+                                    "yAxisScale",
+                                    "horizontalLines",
+                                    "defaultVisibility",
+                                    "chartFormat"
+                                ]
+                            }
+                        },
+                        "kpi__valueColumn": {
+                            "type": ["string", "null"],
+                            "nullable": true,
+                            "description": "The column name used for the KPI value. Null means auto-detect."
+                        },
+                        "kpi__visualType": {
+                            "type": "string",
+                            "description": "The KPI visual sub-type (gauge, bar, donut, number)."
+                        },
+                        "kpi__minValue": { "type": "number", "description": "Minimum value for the KPI range." },
+                        "kpi__maxValue": { "type": "number", "description": "Maximum value for the KPI range." },
+                        "kpi__showMinMaxLabels": {
+                            "type": "boolean",
+                            "description": "Whether to show min/max range labels on the KPI visual."
+                        },
+                        "kpi__valueFormat": {
+                            "type": "object",
+                            "description": "Value formatting options for the KPI visual.",
+                            "properties": {
+                                "format": {
+                                    "type": "string",
+                                    "description": "The format mode for the KPI value.",
+                                    "enum": ["automatic", "full"]
+                                },
+                                "maxDecimalPlaces": {
+                                    "type": "number",
+                                    "description": "Maximum decimal places for the formatted value."
+                                },
+                                "showUnitLabel": {
+                                    "type": "boolean",
+                                    "description": "Whether to show the unit label on the KPI visual."
+                                },
+                                "unit": {
+                                    "type": "string",
+                                    "description": "Unit label text displayed next to the KPI value."
+                                }
+                            },
+                            "required": ["format", "maxDecimalPlaces", "showUnitLabel", "unit"]
+                        },
+                        "kpi__conditionalFormattingEnabled": {
+                            "type": "boolean",
+                            "description": "Whether conditional formatting (color zones) is enabled for the KPI visual."
+                        },
+                        "kpi__conditionalFormatting": {
+                            "type": "object",
+                            "description": "Conditional formatting configuration for the KPI visual.",
+                            "properties": {
+                                "showBadges": {
+                                    "type": "boolean",
+                                    "description": "Whether to show badge tags on the KPI visual."
+                                },
+                                "showZoneMarks": {
+                                    "type": "boolean",
+                                    "description": "Whether to show zone marks on the KPI chart."
+                                },
+                                "zone1": {
+                                    "type": "object",
+                                    "description": "First range zone configuration.",
+                                    "properties": {
+                                        "range": {
+                                            "type": "array",
+                                            "description": "Tuple of [from, to] boundary values for this zone.",
+                                            "items": { "type": "number" },
+                                            "minItems": 2,
+                                            "maxItems": 2
+                                        },
+                                        "indicator": {
+                                            "type": "object",
+                                            "properties": {
+                                                "icon": {
+                                                    "type": "string",
+                                                    "description": "Icon identifier for this zone."
+                                                },
+                                                "label": {
+                                                    "type": "string",
+                                                    "description": "Badge label for this zone."
+                                                }
+                                            },
+                                            "required": ["icon", "label"]
+                                        }
+                                    },
+                                    "required": ["range", "indicator"]
+                                },
+                                "zone2": {
+                                    "type": "object",
+                                    "description": "Second range zone configuration.",
+                                    "properties": {
+                                        "range": {
+                                            "type": "array",
+                                            "description": "Tuple of [from, to] boundary values for this zone.",
+                                            "items": { "type": "number" },
+                                            "minItems": 2,
+                                            "maxItems": 2
+                                        },
+                                        "indicator": {
+                                            "type": "object",
+                                            "properties": {
+                                                "icon": {
+                                                    "type": "string",
+                                                    "description": "Icon identifier for this zone."
+                                                },
+                                                "label": {
+                                                    "type": "string",
+                                                    "description": "Badge label for this zone."
+                                                }
+                                            },
+                                            "required": ["icon", "label"]
+                                        }
+                                    },
+                                    "required": ["range", "indicator"]
+                                },
+                                "zone3": {
+                                    "type": "object",
+                                    "description": "Third range zone configuration.",
+                                    "properties": {
+                                        "range": {
+                                            "type": "array",
+                                            "description": "Tuple of [from, to] boundary values for this zone.",
+                                            "items": { "type": "number" },
+                                            "minItems": 2,
+                                            "maxItems": 2
+                                        },
+                                        "indicator": {
+                                            "type": "object",
+                                            "properties": {
+                                                "icon": {
+                                                    "type": "string",
+                                                    "description": "Icon identifier for this zone."
+                                                },
+                                                "label": {
+                                                    "type": "string",
+                                                    "description": "Badge label for this zone."
+                                                }
+                                            },
+                                            "required": ["icon", "label"]
+                                        }
+                                    },
+                                    "required": ["range", "indicator"]
+                                }
+                            },
+                            "required": ["showBadges", "showZoneMarks", "zone1", "zone2", "zone3"]
+                        },
+                        "kpi__conditionalFormatting_V2": {
+                            "type": "object",
+                            "description": "V2 conditional formatting configuration for the KPI visual with a dynamic list of ranges. Supersedes the fixed zone1/zone2/zone3 shape.",
+                            "properties": {
+                                "showBadges": {
+                                    "type": "boolean",
+                                    "description": "Whether to show badge tags on the KPI visual."
+                                },
+                                "showZoneMarks": {
+                                    "type": "boolean",
+                                    "description": "Whether to show zone marks on the KPI chart."
+                                },
+                                "ranges": {
+                                    "type": "array",
+                                    "description": "Dynamic list of conditional-formatting ranges, ordered by identity.",
+                                    "items": {
+                                        "type": "object",
+                                        "properties": {
+                                            "range": {
+                                                "type": "array",
+                                                "description": "Tuple of [from, to] boundary values for this range.",
+                                                "items": { "type": "number" },
+                                                "minItems": 2,
+                                                "maxItems": 2
+                                            },
+                                            "label": { "type": "string", "description": "Badge label for this range." },
+                                            "color": {
+                                                "type": "string",
+                                                "description": "Optional color override. Omitted when the range uses the automatic palette color."
+                                            },
+                                            "labelIcon": {
+                                                "type": "string",
+                                                "description": "Optional icon shown with the badge label."
+                                            }
+                                        },
+                                        "required": ["range", "label"]
+                                    }
+                                }
+                            },
+                            "required": ["showBadges", "showZoneMarks", "ranges"]
+                        },
+                        "kpi__referenceLines": {
+                            "type": "object",
+                            "description": "Reference lines configuration for the KPI visual.",
+                            "properties": {
+                                "showLabels": {
+                                    "type": "boolean",
+                                    "description": "Whether to show labels on reference lines."
+                                },
+                                "lines": {
+                                    "type": "array",
+                                    "description": "Array of reference line values.",
+                                    "items": {
+                                        "type": "object",
+                                        "properties": {
+                                            "value": { "type": "number", "description": "The reference line value." }
+                                        },
+                                        "required": ["value"]
+                                    }
+                                }
+                            },
+                            "required": ["showLabels", "lines"]
+                        },
+                        "kpi__styling": {
+                            "type": "object",
+                            "description": "Styling options for the KPI visual (arc angle, arc thickness, cap style, gradient fill).",
+                            "properties": {
+                                "arcAngle": {
+                                    "type": "number",
+                                    "description": "The arc angle (in degrees) for gauge KPI visuals.",
+                                    "enum": [180, 220, 270]
+                                },
+                                "arcThickness": {
+                                    "type": "number",
+                                    "description": "The thickness of the KPI arc/band, as a fraction of its radius."
+                                },
+                                "capStyle": {
+                                    "type": "string",
+                                    "description": "The cap style for the KPI arc/band ends.",
+                                    "enum": ["rounded", "flat"]
+                                },
+                                "gradientFill": {
+                                    "type": "boolean",
+                                    "description": "Whether to render the KPI arc/band with a gradient fill."
+                                }
+                            },
+                            "required": ["arcAngle", "arcThickness", "capStyle", "gradientFill"]
+                        },
+                        "multiKpi__labelColumn": {
+                            "type": ["string", "null"],
+                            "nullable": true,
+                            "description": "The column name used to label each KPI item in the Multi KPI visual. Null means auto-detect."
+                        },
+                        "multiKpi__limit": {
+                            "type": "number",
+                            "description": "Maximum number of KPI items rendered in the Multi KPI visual grid."
+                        },
+                        "multiKpi__orientation": {
+                            "type": "string",
+                            "description": "Grid layout orientation for the Multi KPI visual.",
+                            "enum": ["auto", "horizontal", "vertical"]
+                        },
+                        "multiKpi__dataMapping": {
+                            "type": "string",
+                            "description": "Whether rows or columns in the query result are mapped to Multi KPI items.",
+                            "enum": ["rows", "columns"]
+                        }
+                    }
+                }
+            },
+            "required": ["id", "title", "layout", "pageId", "visualType", "visualOptions"],
+            "errorMessage": {
+                "required": "`tiles` requires the following properties to be defined on each entry: [\"id\", \"title\", \"layout\", \"pageId\", \"visualType\", \"usedParamVariables\", \"visualOptions\"]"
+            },
+            "if": { "properties": { "visualType": { "const": "markdownCard" } } },
+            "then": {
+                "properties": {
+                    "layout": {
+                        "type": "object",
+                        "properties": {
+                            "width": {
+                                "type": "number",
+                                "description": "How wide the tile is",
+                                "minimum": 2,
+                                "examples": [2],
+                                "errorMessage": { "type": "\"tiles.layout.width\" is expected to be a number >= 2" }
+                            },
+                            "height": {
+                                "type": "number",
+                                "description": "How tall the tile is",
+                                "minimum": 1,
+                                "examples": [1],
+                                "errorMessage": { "type": "\"tiles.layout.height\" is expected to be a number >= 1" }
+                            }
+                        }
+                    },
+                    "markdownText": { "type": "string" }
+                },
+                "required": ["markdownText"]
+            },
+            "else": {
+                "allOf": [
+                    {
+                        "if": { "properties": { "visualType": { "const": "designTile" } }, "required": ["visualType"] },
+                        "then": {
+                            "properties": { "visualOptions": { "type": "object", "required": ["designTile__kind"] } }
+                        }
+                    },
+                    {
+                        "if": {
+                            "properties": {
+                                "visualType": {
+                                    "enum": [
+                                        "agent",
+                                        "anomalychart",
+                                        "area",
+                                        "bar",
+                                        "card",
+                                        "column",
+                                        "embeddedapp",
+                                        "fabricmap",
+                                        "funnel",
+                                        "heatmap",
+                                        "kpi",
+                                        "line",
+                                        "linechart",
+                                        "map",
+                                        "markdown",
+                                        "multiKpi",
+                                        "multikpi",
+                                        "multistat",
+                                        "pie",
+                                        "plotly",
+                                        "scatter",
+                                        "stacked100area",
+                                        "stacked100bar",
+                                        "stacked100column",
+                                        "stackedarea",
+                                        "stackedbar",
+                                        "stackedcolumn",
+                                        "stat",
+                                        "table",
+                                        "timechart",
+                                        "timepivot",
+                                        "timeseries",
+                                        "visualbuilder"
+                                    ]
+                                }
+                            },
+                            "required": ["visualType"]
+                        },
+                        "then": {
+                            "properties": { "queryRef": { "$ref": "query.json#/$defs/queryRef" } },
+                            "required": ["queryRef"]
+                        }
+                    }
+                ]
+            }
+        }
+    },
+    "$defs": {
+        "colorRule": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string",
+                    "description": "The UUID of color rule",
+                    "format": "uuid",
+                    "examples": ["ff1b7293-2ea2-46d2-90cb-6c7061b6a084"],
+                    "errorMessage": {
+                        "type": "Needs to follow the UUID format as defined by RFC 4122 (https://datatracker.ietf.org/doc/html/rfc4122). Example: 3e4666bf-d5e5-4aa7-b8ce-cefe41c7568a"
+                    }
+                },
+                "ruleName": { "type": "string", "description": "The name of the rule" },
+                "applyTo": {
+                    "enum": ["cells", "rows"],
+                    "description": "Wether to apply the rule to cells or to the entire row"
+                },
+                "visualType": { "type": "string" },
+                "ruleType": {
+                    "description": "Defines if the rule is coloring by value or by conditions",
+                    "enum": ["colorByValue", "colorByCondition"]
+                }
+            },
+            "required": ["id", "ruleName", "applyTo", "visualType", "ruleType"],
+            "errorMessage": {
+                "required": "\"tiles.visualOptions.colorRules\" requires the following properties to be defined: [\"id\", \"ruleType\"]"
+            },
+            "allOf": [
+                {
+                    "if": { "properties": { "ruleType": { "const": "colorByValue" } } },
+                    "then": {
+                        "properties": {
+                            "column": {
+                                "type": ["string", "null"],
+                                "nullable": true,
+                                "description": "The name of the column when using Color By Value"
+                            },
+                            "themeName": {
+                                "type": ["string", "null"],
+                                "enum": [null, "traffic-lights", "cold", "warm", "blue", "red", "yellow"],
+                                "description": "The name of the theme when using 'color by value'",
+                                "nullable": true,
+                                "errorMessage": {
+                                    "type": "\"tiles.visualOptions.colorRules.themeName\" is an Enum and expects one of the following values: [\"traffic-lights\", \"cold\", \"warm\", \"blue\", \"red\", \"yellow\"]"
+                                }
+                            },
+                            "maxValue": {
+                                "type": ["string", "null"],
+                                "nullable": true,
+                                "description": "The maximum value of a column if using 'color by value'"
+                            },
+                            "minValue": {
+                                "type": ["string", "null"],
+                                "nullable": true,
+                                "description": "The minimum value of a column if using 'color by value'"
+                            },
+                            "reverseTheme": {
+                                "type": "boolean",
+                                "description": "An option to reverse the theme colors palette"
+                            }
+                        },
+                        "required": ["column", "themeName", "maxValue", "minValue", "reverseTheme"]
+                    }
+                },
+                {
+                    "if": { "properties": { "ruleType": { "const": "colorByCondition" } } },
+                    "then": {
+                        "properties": {
+                            "chainingOperator": {
+                                "enum": ["and", "or"],
+                                "description": "Either to chain this rule with and 'and' or an 'or' operator"
+                            },
+                            "colorStyle": {
+                                "enum": ["light", "bold"],
+                                "description": "The color style (e.g. `light` or `bold)",
+                                "errorMessage": {
+                                    "type": "\"tiles.visualOptions.colorStyles\" is an Enum and expects one of the following values: [\"light\", \"bold\"]"
+                                }
+                            },
+                            "applyToColumn": {
+                                "type": ["string", "null"],
+                                "nullable": true,
+                                "description": "The column we want to color"
+                            },
+                            "conditions": {
+                                "type": "array",
+                                "description": "The conditions for the color rule (e.g. `>=` or `==`)",
+                                "maxItems": 2,
+                                "items": {
+                                    "type": "object",
+                                    "properties": {
+                                        "column": {
+                                            "type": ["string", "null"],
+                                            "nullable": true,
+                                            "description": "The column we want to check the condition on"
+                                        },
+                                        "operator": {
+                                            "enum": [">", ">=", "<", "<=", "==", "!=", "between"],
+                                            "description": "The sign of comparison for the operator",
+                                            "errorMessage": {
+                                                "required": "\"tiles.visualOptions.colorRules.conditions\" is an Enum and expects one of the following values: [\">\", \">=\", \"<\", \"<=\", \"==\", \"between\"]"
+                                            }
+                                        },
+                                        "values": {
+                                            "type": "array",
+                                            "description": "The values for the condition",
+                                            "items": {
+                                                "type": "string",
+                                                "errorMessage": { "type": "Expected to be a string" }
+                                            }
+                                        }
+                                    },
+                                    "required": ["column", "operator", "values"],
+                                    "errorMessage": {
+                                        "required": "\"tiles.visualOptions.colorRules.conditions\" requires the following properties to be defined: [\"operator\", \"values\"]"
+                                    }
+                                }
+                            },
+                            "color": {
+                                "type": ["string", "null"],
+                                "enum": [null, "red", "yellow", "green", "blue"],
+                                "nullable": true,
+                                "description": "The name of the color",
+                                "errorMessage": {
+                                    "type": "\"tiles.visualOptions.colorRules.color\" is an Enum and expects one of the following values: [\"red\", \"yellow\", \"green\", \"blue\"]"
+                                }
+                            },
+                            "tag": { "type": "string", "description": "The text for the indicator" },
+                            "icon": {
+                                "type": ["string", "null"],
+                                "enum": [
+                                    null,
+                                    "critical",
+                                    "warning",
+                                    "completed",
+                                    "tentative",
+                                    "happy",
+                                    "sad",
+                                    "emojiNeutral",
+                                    "circle",
+                                    "circleFill",
+                                    "contrast",
+                                    "square",
+                                    "squareSolid",
+                                    "diamond",
+                                    "octagon",
+                                    "cloud",
+                                    "tvMonitor",
+                                    "globe",
+                                    "strength",
+                                    "eatDrink",
+                                    "cocktail",
+                                    "apple",
+                                    "repair",
+                                    "circleDollar",
+                                    "rate",
+                                    "arrowUp",
+                                    "arrowDown",
+                                    "ferry",
+                                    "car",
+                                    "plane",
+                                    "baseball",
+                                    "soccer",
+                                    "basketball",
+                                    "football",
+                                    "tennis",
+                                    "golf",
+                                    "world",
+                                    "heart",
+                                    "insights"
+                                ],
+                                "nullable": true,
+                                "description": "The icon type (e.g. `completed`, `apple`, or, `cloud`, etc.)",
+                                "errorMessage": {
+                                    "type": "\"tiles.visualOptions.colorRules.icon\" is an Enum and expects one of the following values: [\"critical\", \"warning\", \"completed\", \"tentative\", \"happy\", \"sad\", \"emojiNeutral\", \"circle\", \"circleFill\", \"contrast\", \"square\", \"squareSolid\", \"diamond\", \"octagon\", \"cloud\", \"tvMonitor\", \"globe\", \"strength\", \"eatDrink\", \"cocktail\", \"apple\", \"repair\", \"circleDollar\", \"rate\", \"arrowUp\", \"arrowDown\", \"ferry\", \"car\", \"plane\", \"baseball\", \"soccer\", \"basketball\", \"football\", \"tennis\", \"golf\", \"world\", \"heart\", \"insights\"]"
+                                }
+                            },
+                            "hideText": { "type": "boolean" }
+                        },
+                        "required": [
+                            "chainingOperator",
+                            "colorStyle",
+                            "applyToColumn",
+                            "conditions",
+                            "color",
+                            "tag",
+                            "icon",
+                            "hideText"
+                        ]
+                    }
+                }
+            ]
+        }
+    }
+}

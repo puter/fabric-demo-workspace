@@ -1,0 +1,18 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "/static/d/schema/89/baseQuery.json",
+    "meta": { "schema_version": 89, "json_filename": "baseQuery.json" },
+    "title": "Base query schema",
+    "type": "object",
+    "properties": {
+        "baseQuery": {
+            "type": "object",
+            "properties": {
+                "id": { "$ref": "dashboard.json#/$defs/uuid" },
+                "queryId": { "$ref": "dashboard.json#/$defs/uuid" },
+                "variableName": { "$ref": "dashboard.json#/$defs/variableName" }
+            },
+            "required": ["id", "queryId", "variableName"]
+        }
+    }
+}

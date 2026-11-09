@@ -1,0 +1,38 @@
+# Fabric deployment layout (ADR 0001 + ADR 0002). Names only — every id is
+# resolved at deploy time from the signed-in tenant, never committed.
+
+workspace_name: ws-example   # set to your own Fabric workspace
+scenario_folder: Miami Valley Ops Intelligence
+
+folders:
+  platform: "00 - Domain Platform"
+  ingestion: "10 - Ingestion"
+  transformation: "20 - Transformation"
+  products: "30 - Data Products"
+  orchestration: "40 - Orchestration"
+
+items:
+  lakehouse: lh_mvoi
+  eventhouse: eh_mvoi
+  kql_database: kqldb_mvoi
+  eventstream: es_mvoi_events
+  environment: env_mvoi
+  pipeline: pl_mvoi_medallion
+  dashboard: rtd_mvoi_operations
+  activator: act_mvoi_alerts
+  semantic_model: sm_mvoi_historical
+  data_agent: da_mvoi
+
+eventstream:
+  source_node: PollerEndpoint
+  destination_node: EventhouseEvents
+  retention_days: 1
+  throughput: Low
+
+medallion_schedule:
+  interval_minutes: 60
+  time_zone: Eastern Standard Time
+
+alerts:
+  stale_after_minutes: 5
+  # Recipients are passed with --alert-email / --alert-teams (not committed).

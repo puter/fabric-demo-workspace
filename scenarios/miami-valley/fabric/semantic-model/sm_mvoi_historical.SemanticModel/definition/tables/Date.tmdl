@@ -1,0 +1,62 @@
+/// Calendar dimension (one row per day), conformed across all facts.
+table Date
+	dataCategory: Time
+
+	column Date
+		dataType: dateTime
+		isKey
+		formatString: yyyy-mm-dd
+		summarizeBy: none
+		sourceColumn: date
+
+	column Year
+		dataType: int64
+		formatString: 0
+		summarizeBy: none
+		sourceColumn: year
+
+	column Quarter
+		dataType: string
+		summarizeBy: none
+		sourceColumn: quarter
+
+	column 'Month Number'
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: month_number
+
+	column Month
+		dataType: string
+		summarizeBy: none
+		sortByColumn: 'Month Number'
+		sourceColumn: month_name
+
+	column 'Year Month'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: year_month
+
+	column 'Day of Week Number'
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: day_of_week_number
+
+	column 'Day of Week'
+		dataType: string
+		summarizeBy: none
+		sortByColumn: 'Day of Week Number'
+		sourceColumn: day_of_week
+
+	column 'Week Start'
+		dataType: dateTime
+		formatString: yyyy-mm-dd
+		summarizeBy: none
+		sourceColumn: week_start
+
+	partition Date = entity
+		mode: directLake
+		source
+			entityName: gold_date
+			expressionSource: 'DirectLake - MVOI Lakehouse'

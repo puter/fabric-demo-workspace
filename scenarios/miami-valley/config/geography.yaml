@@ -1,0 +1,93 @@
+# Area of interest for Miami Valley Operations Intelligence.
+# Every consumer (polling service, KQL functions, notebooks) reads these values;
+# change them here, not in code.
+
+region_name: Miami Valley, Ohio
+
+bounding_box:
+  north: 40.25
+  south: 39.45
+  west: -84.60
+  east: -83.65
+
+# Map default view for dashboards (Dayton).
+map_center:
+  latitude: 39.7589
+  longitude: -84.1916
+  zoom: 9
+
+# NWS: alerts are requested for the whole state, then kept when their polygon
+# or forecast zone intersects the bounding box. These are the NWS forecast
+# zones (UGC codes) whose extent overlaps the box — generated from the NWS
+# /zones API by scripts/build_reference_data.py. Used for alerts that carry
+# zones but no polygon.
+nws:
+  area: OH
+  forecast_zones:
+    OHZ042: Darke
+    OHZ043: Shelby
+    OHZ044: Logan
+    OHZ051: Miami
+    OHZ052: Champaign
+    OHZ053: Clark
+    OHZ054: Madison
+    OHZ060: Preble
+    OHZ061: Montgomery
+    OHZ062: Greene
+    OHZ063: Fayette
+    OHZ070: Butler
+    OHZ071: Warren
+    OHZ072: Clinton
+  county_zones:
+    OHC017: Butler
+    OHC021: Champaign
+    OHC023: Clark
+    OHC027: Clinton
+    OHC037: Darke
+    OHC047: Fayette
+    OHC057: Greene
+    OHC091: Logan
+    OHC097: Madison
+    OHC109: Miami
+    OHC113: Montgomery
+    OHC135: Preble
+    OHC149: Shelby
+    OHC165: Warren
+
+# Highway corridors used for corridor-level analytics. `aliases` are matched
+# against OHGO `routeName` after normalisation (see mvoi.geo.corridors).
+corridors:
+  - id: I-75
+    name: Interstate 75
+    aliases: ["I-75", "IR-75", "I 75", "INTERSTATE 75"]
+  - id: I-70
+    name: Interstate 70
+    aliases: ["I-70", "IR-70", "I 70", "INTERSTATE 70"]
+  - id: I-675
+    name: Interstate 675
+    aliases: ["I-675", "IR-675", "I 675"]
+  - id: US-35
+    name: US Route 35
+    aliases: ["US-35", "US 35", "US35"]
+  - id: SR-4
+    name: State Route 4
+    aliases: ["SR-4", "SR 4", "OH-4"]
+  - id: US-40
+    name: US Route 40 (National Road)
+    aliases: ["US-40", "US 40"]
+  - id: SR-444
+    name: State Route 444
+    aliases: ["SR-444", "SR 444"]
+  - id: US-36
+    name: US Route 36
+    aliases: ["US-36", "US 36"]
+  - id: SR-48
+    name: State Route 48
+    aliases: ["SR-48", "SR 48"]
+  - id: US-68
+    name: US Route 68
+    aliases: ["US-68", "US 68"]
+
+# Spatial fallback: when routeName does not match an alias, snap to the
+# nearest corridor geometry within this distance.
+corridor_snap_distance_m: 300

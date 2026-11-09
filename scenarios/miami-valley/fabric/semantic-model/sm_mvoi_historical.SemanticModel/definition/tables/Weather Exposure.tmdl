@@ -1,0 +1,59 @@
+/// NWS alerts whose area covered a site.
+table 'Weather Exposure'
+
+	/// Distinct NWS alerts covering at least one site in context.
+	measure 'Weather Alerts at Sites' = DISTINCTCOUNT('Weather Exposure'[Alert Key])
+		formatString: #,##0
+		displayFolder: Weather
+
+	/// Distinct sites covered by an NWS alert in context.
+	measure 'Sites Under Alert' = DISTINCTCOUNT('Weather Exposure'[Site Key])
+		formatString: #,##0
+		displayFolder: Weather
+
+	column 'Alert Key'
+		dataType: string
+		isHidden
+		summarizeBy: none
+		sourceColumn: alert_key
+
+	column 'Site Key'
+		dataType: string
+		isHidden
+		summarizeBy: none
+		sourceColumn: facility_id
+
+	column 'Date Key'
+		dataType: dateTime
+		isHidden
+		summarizeBy: none
+		sourceColumn: onset_date
+
+	column 'Weather Event'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: event
+
+	/// Common Alerting Protocol severity from NWS (Extreme/Severe/Moderate/Minor)
+	column 'CAP Severity'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: cap_severity
+
+	column Onset
+		dataType: dateTime
+		formatString: yyyy-mm-dd hh:nn
+		summarizeBy: none
+		sourceColumn: onset
+
+	column Expires
+		dataType: dateTime
+		formatString: yyyy-mm-dd hh:nn
+		summarizeBy: none
+		sourceColumn: expires
+
+	partition 'Weather Exposure' = entity
+		mode: directLake
+		source
+			entityName: gold_weather_exposure
+			expressionSource: 'DirectLake - MVOI Lakehouse'

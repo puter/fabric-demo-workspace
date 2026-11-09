@@ -1,0 +1,68 @@
+# Example questions -> KQL for the kqldb_mvoi data source. Each query should
+# call a stored function from fabric/eventhouse/kqldb_mvoi.kql (enforced by
+# tests/unit/test_dataagent.py). Keep this list short: examples are sent
+# with questions and count toward token cost.
+
+- question: Which sites have high disruption exposure right now?
+  query: |
+    CurrentFacilityRisk()
+    | where score >= 70
+    | project facility_name, city, score, band, explanation
+
+- question: During the demo replay, which sites are exposed?
+  query: |
+    CurrentFacilityRisk("replay")
+    | where score >= 50
+    | project facility_name, city, score, band, explanation
+
+- question: What is affecting Sinclair Conference Center right now?
+  query: |
+    IncidentsNearSite(site = "Sinclair Conference Center")
+    | project ['title'], route_name, severity, is_road_closure, distance_mi, minutes_active
+
+- question: Are any roads closed right now?
+  query: |
+    ActiveIncidents()
+    | where is_road_closure
+    | project route_name, direction, location, severity, minutes_active
+
+- question: What is happening on I-75?
+  query: |
+    ActiveIncidents()
+    | where corridor_id == "I-75"
+    | project entity_type, severity, direction, location, ['title'], minutes_active
+
+- question: How many new incidents on I-75 in the last 24 hours?
+  query: |
+    NewIncidents(lookback = 24h)
+    | where corridor_id == "I-75"
+    | count
+
+- question: Which corridor has the most active incidents?
+  query: |
+    IncidentCountsByCorridor()
+
+- question: What weather warnings are active?
+  query: |
+    ActiveWeatherAlerts()
+    | project event, severity, headline, area, onset, expires
+
+- question: Are there any open alerts?
+  query: |
+    OpenAlerts()
+    | project raised_at, facility_name, message
+
+- question: How many new incidents in the last 30 minutes?
+  query: |
+    NewIncidentWindows()
+    | project last_30m
+
+- question: How has disruption around Sinclair Conference Center changed today?
+  query: |
+    FacilityRiskTimeline(lookback = 24h)
+    | where facility_name == "Sinclair Conference Center"
+
+- question: Is the data feed up to date?
+  query: |
+    IngestionFreshness()
+    | project source, minutes_since_success, consecutive_failures, last_error

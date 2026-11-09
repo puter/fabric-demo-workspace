@@ -1,0 +1,54 @@
+/// Disruption metrics per corridor per day.
+table 'Corridor Daily'
+
+	/// Hours of full road closure attributed to the corridor.
+	measure 'Closure Hours' = DIVIDE(SUM('Corridor Daily'[Closure Minutes]), 60)
+		formatString: #,##0.0
+		displayFolder: Corridors
+
+	/// Median of daily median durations (robust to outliers).
+	measure 'Median Incident Duration Minutes' = MEDIAN('Corridor Daily'[Median Duration Minutes])
+		formatString: #,##0.0
+		displayFolder: Corridors
+
+	column 'Date Key'
+		dataType: dateTime
+		isHidden
+		summarizeBy: none
+		sourceColumn: start_date
+
+	column 'Corridor Key'
+		dataType: string
+		isHidden
+		summarizeBy: none
+		sourceColumn: corridor
+
+	column Occurrences
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: occurrences
+
+	column Closures
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: closures
+
+	column 'Closure Minutes'
+		dataType: double
+		isHidden
+		summarizeBy: none
+		sourceColumn: closure_minutes
+
+	column 'Median Duration Minutes'
+		dataType: double
+		isHidden
+		summarizeBy: none
+		sourceColumn: median_duration_minutes
+
+	partition 'Corridor Daily' = entity
+		mode: directLake
+		source
+			entityName: gold_corridor_disruption_daily
+			expressionSource: 'DirectLake - MVOI Lakehouse'

@@ -1,0 +1,30 @@
+/// Bridge: occurrences located inside an NWS alert area during the alert window.
+table 'Incident Weather'
+
+	column 'Occurrence Key'
+		dataType: string
+		isHidden
+		summarizeBy: none
+		sourceColumn: occurrence_id
+
+	column 'Alert Key'
+		dataType: string
+		isHidden
+		summarizeBy: none
+		sourceColumn: alert_key
+
+	column 'Weather Event'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: event
+
+	column 'CAP Severity'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: cap_severity
+
+	partition 'Incident Weather' = entity
+		mode: directLake
+		source
+			entityName: gold_incident_weather
+			expressionSource: 'DirectLake - MVOI Lakehouse'

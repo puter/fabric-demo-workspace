@@ -1,0 +1,363 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "/static/d/schema/89/dashboard.json",
+    "meta": { "schema_version": 89, "json_filename": "dashboard.json" },
+    "title": "Dashboard schema",
+    "description": "A dashboard schema definition",
+    "type": "object",
+    "properties": {
+        "$schema": { "type": "string" },
+        "schema_version": {
+            "type": "integer",
+            "description": "The schema version for the dashboard",
+            "const": 89,
+            "errorMessage": { "type": "\"schema_version\" is required to be the value: \"89\"" }
+        },
+        "id": { "$ref": "dashboard.json#/$defs/uuid" },
+        "title": { "$ref": "dashboard.json#/$defs/populatedString" },
+        "pagesNavWidth": {
+            "type": "number",
+            "minimum": 112,
+            "description": "Pages nav width",
+            "errorMessage": {
+                "type": "\"pagesNavWidth\" is expected to be an integer >= 112",
+                "minimum": "\"pagesNavWidth\" is expected to be an integer >= 112"
+            }
+        },
+        "eTag": {
+            "type": "string",
+            "description": "Dashboard version id. Created whenever a dashboard is saved.",
+            "examples": ["EG9AD8VSt00tewoU5GQgcQ=="],
+            "errorMessage": { "type": "Expected to be a string" }
+        },
+        "flavor": {
+            "type": "string",
+            "description": "Dashboard flavor representing the template type (e.g., semantic)",
+            "errorMessage": { "type": "Expected to be a string" }
+        },
+        "autoRefresh": {
+            "type": "object",
+            "description": "Config for auto refreshing the dashboard on an interval",
+            "properties": {
+                "enabled": {
+                    "type": "boolean",
+                    "description": "Is auto refresh enabled for this dashboard?",
+                    "errorMessage": { "type": "\"autoRefresh.enabled\" is expected to be a boolean (true or false)" }
+                },
+                "defaultInterval": {
+                    "type": "string",
+                    "enum": ["1s", "10s", "30s", "1m", "5m", "15m", "30m", "1h", "2h", "1d"],
+                    "errorMessage": {
+                        "enum": "\"autoRefresh.defaultInterval\" is an Enum and expects one of the following values: [\"1s\",\"10s\",\"30s\",\"1m\",\"5m\",\"15m\",\"30m\",\"1h\",\"2h\",\"1d\"]"
+                    }
+                },
+                "minInterval": {
+                    "type": "string",
+                    "enum": ["1s", "10s", "30s", "1m", "5m", "15m", "30m", "1h", "2h", "1d"],
+                    "errorMessage": {
+                        "enum": "\"autoRefresh.minInterval\" is an Enum and expects one of the following values: [\"1s\",\"10s\",\"30s\",\"1m\",\"5m\",\"15m\",\"30m\",\"1h\",\"2h\",\"1d\"]"
+                    }
+                }
+            },
+            "required": ["enabled"],
+            "errorMessage": {
+                "type": "\"autoRefresh\" is expected to be one of: { enabled: false } | { enabled: true, defaultInterval?: Enum<\"1s\", \"10s\", \"30s\", \"1m\", \"5m\", \"15m\", \"30m\", \"1h\", \"2h\", \"1d\">, minInterval?: Enum<\"1s\", \"10s\", \"30s\", \"1m\", \"5m\", \"15m\", \"30m\", \"1h\", \"2h\", \"1d\"}> }"
+            },
+            "examples": [
+                { "enabled": false },
+                { "enabled": true, "defaultInterval": "5m" },
+                { "enabled": true, "defaultInterval": "1m", "minInterval": "30s" }
+            ]
+        },
+        "changeDetection": {
+            "type": "object",
+            "description": "Config for dashboard change detection",
+            "oneOf": [
+                {
+                    "type": "object",
+                    "properties": {
+                        "kind": {
+                            "type": "string",
+                            "const": "manualUpdates",
+                            "description": "Manual update mode - no automatic refresh"
+                        }
+                    },
+                    "required": ["kind"]
+                },
+                {
+                    "type": "object",
+                    "properties": {
+                        "kind": {
+                            "type": "string",
+                            "const": "liveUpdates",
+                            "description": "Live updates mode - automatic refresh with intervals"
+                        },
+                        "minRefreshRate": {
+                            "type": "string",
+                            "enum": ["10s", "30s", "1m", "5m", "15m", "30m", "1h", "2h", "1d"],
+                            "description": "Minimum refresh rate supported by earlier dashboard versions"
+                        },
+                        "minRefreshRate_V2": {
+                            "type": "string",
+                            "enum": ["5s", "10s", "30s", "1m", "5m", "15m", "30m", "1h", "2h", "1d"],
+                            "description": "Minimum refresh rate for change detection"
+                        },
+                        "fallbackRefreshRate": {
+                            "type": "string",
+                            "enum": ["30s", "1m", "5m", "15m", "30m", "1h", "2h", "1d"],
+                            "description": "Fallback refresh rate when live updates fail"
+                        }
+                    },
+                    "required": ["kind", "minRefreshRate", "fallbackRefreshRate"]
+                }
+            ],
+            "errorMessage": {
+                "oneOf": "\"changeDetection\" is expected to be one of: { kind: 'manualUpdates' } | { kind: 'liveUpdates', minRefreshRate?: Enum<\"10s\", \"30s\", \"1m\", \"5m\", \"15m\", \"30m\", \"1h\", \"2h\", \"1d\">, minRefreshRate_V2?: Enum<\"5s\", \"10s\", \"30s\", \"1m\", \"5m\", \"15m\", \"30m\", \"1h\", \"2h\", \"1d\">, fallbackRefreshRate?: Enum<\"30s\", \"1m\", \"5m\", \"15m\", \"30m\", \"1h\", \"2h\", \"1d\"> }"
+            }
+        },
+        "baseQueries": {
+            "type": "array",
+            "items": { "$ref": "baseQuery.json#/properties/baseQuery" },
+            "examples": [
+                {
+                    "id": "f411e9ed-fe75-4762-82da-9c430c184afb",
+                    "variableName": "_baseQuery",
+                    "queryId": "8d7d05ce-b7da-42f3-93f2-712438c86f7f"
+                }
+            ]
+        },
+        "dataSources": {
+            "type": "array",
+            "description": "An array of data source objects",
+            "items": { "$ref": "dataSource.json#/properties/dataSource" },
+            "examples": [
+                {
+                    "id": "f411e9ed-fe75-4762-82da-9c430c184afb",
+                    "name": "Kusto Samples",
+                    "kind": "manual-kusto",
+                    "clusterUri": "https://help.kusto.windows.net",
+                    "database": "Samples"
+                }
+            ],
+            "errorMessage": { "type": "\"dataSources\" is expected to be an array of: objects" }
+        },
+        "pages": {
+            "type": "array",
+            "description": "An array of page objects",
+            "minItems": 1,
+            "items": {
+                "type": "object",
+                "properties": {
+                    "id": { "$ref": "dashboard.json#/$defs/uuid" },
+                    "name": { "$ref": "dashboard.json#/$defs/populatedString" }
+                },
+                "required": ["id", "name"],
+                "errorMessage": {
+                    "type": "\"pages\" requires the following properties to be defined: [\"id\", \"name\"]"
+                }
+            },
+            "examples": [
+                [
+                    { "name": "Page 1", "id": "zxb59e27-c2e1-4f49-b407-9a1978d09d44" },
+                    { "name": "Page 2", "id": "9c5zw2f4-6e2f-41cd-b593-49d6a5151e93" }
+                ]
+            ]
+        },
+        "tiles": {
+            "type": "array",
+            "description": "An array of tile objects",
+            "items": { "$ref": "tile.json#/properties/tile" },
+            "errorMessage": { "type": "`tiles` expects an array of tile objects. The array can be empty." },
+            "examples": [
+                {
+                    "id": "ff1b7293-2ea2-46d2-90cb-6c7061b6a084",
+                    "title": "Stat, Numeric, Small",
+                    "queryRef": { "kind": "query", "queryId": "f723867e-66a2-4f7b-9e08-4106eafe17b5" },
+                    "layout": { "x": 0, "y": 13, "width": 3, "height": 3 },
+                    "pageId": "fb83e70b-0cc7-4784-87e6-e0f8da742765",
+                    "visualType": "card",
+                    "visualOptions": {
+                        "yAxisRight": false,
+                        "multiStat__textSize": "small",
+                        "multiStat__valueColumn": null,
+                        "selectedDataOnLoad": { "all": true, "limit": 10 }
+                    }
+                },
+                {
+                    "id": "83f9efbd-2b04-4ffd-9baf-536dc1db423c",
+                    "title": "Area",
+                    "queryRef": { "kind": "query", "queryId": "30d85bec-7060-4811-b541-cd3541fdd6de" },
+                    "layout": { "x": 0, "y": 1, "width": 4, "height": 6 },
+                    "pageId": "fb83e70b-0cc7-4784-87e6-e0f8da742765",
+                    "visualType": "area",
+                    "visualOptions": {
+                        "hideLegend": false,
+                        "yAxisMinimumValue": null,
+                        "yAxisMaximumValue": null,
+                        "xColumn": null,
+                        "xColumnTitle": "",
+                        "yColumns": null,
+                        "yColumnTitle": "",
+                        "yAxisRight": false,
+                        "multipleYAxes": {
+                            "base": {
+                                "id": "-1",
+                                "columns": [],
+                                "label": "",
+                                "yAxisMinimumValue": null,
+                                "yAxisMaximumValue": null,
+                                "yAxisScale": "linear",
+                                "horizontalLines": []
+                            },
+                            "additional": [],
+                            "showMultiplePanels": false
+                        },
+                        "selectedDataOnLoad": { "all": false, "limit": 10 }
+                    }
+                },
+                {
+                    "id": "b5c61589-2e7a-4c0b-9d43-4b6bf3bd95ec",
+                    "title": "Tile using data source parameter",
+                    "hideTitle": true,
+                    "visualType": "table",
+                    "pageId": "f811c38a-fb25-42f4-a5e9-d25834c0228d",
+                    "layout": { "x": 0, "y": 0, "width": 9, "height": 7 },
+                    "queryRef": { "kind": "query", "queryId": "22b93002-cacc-478a-84da-a64e3f4ca730" },
+                    "visualOptions": {
+                        "table__enableRenderLinks": true,
+                        "table__renderLinks": [],
+                        "colorRules": [],
+                        "colorRulesDisabled": true,
+                        "crossFilterDisabled": false,
+                        "drillthroughDisabled": false,
+                        "crossFilter": [],
+                        "drillthrough": [],
+                        "selectedDataOnLoad": { "all": false, "limit": 10 }
+                    }
+                }
+            ]
+        },
+        "parameters": {
+            "type": "array",
+            "description": "An array of parameter objects",
+            "items": { "$ref": "parameter.json#/properties/parameter" },
+            "examples": [
+                {
+                    "kind": "long",
+                    "id": "26fa25be-652b-44a3-986d-4ab70f59f75b",
+                    "displayName": "DataPoints",
+                    "description": "DataPointsDescription",
+                    "variableName": "numValues",
+                    "selectionType": "scalar",
+                    "includeAllOption": false,
+                    "defaultValue": { "kind": "value", "value": "5" },
+                    "showOnPages": { "kind": "all" },
+                    "dataSource": {
+                        "kind": "query",
+                        "queryRef": { "kind": "query", "queryId": "f723867e-66a2-4f7b-9e08-4106eafe17b3" },
+                        "columns": { "value": "x" }
+                    }
+                },
+                {
+                    "kind": "string",
+                    "id": "04a18aae-bc53-4cf4-aea5-46b6e1c9d899",
+                    "displayName": "State",
+                    "description": "State description",
+                    "variableName": "_state",
+                    "selectionType": "array",
+                    "includeAllOption": true,
+                    "defaultValue": { "kind": "value", "value": "WASHINGTON" },
+                    "showOnPages": { "kind": "all" },
+                    "dataSource": {
+                        "kind": "query",
+                        "queryRef": { "kind": "query", "queryId": "e723867e-66a2-4f7b-9e08-4106eafe17b3" },
+                        "columns": { "value": "State" }
+                    }
+                },
+                {
+                    "kind": "duration",
+                    "id": "7b25dff6-6e35-4432-bd1c-aebdc984f528",
+                    "displayName": "MyDate",
+                    "description": "MyDate description",
+                    "beginVariableName": "MyStartDate",
+                    "endVariableName": "MyEndDate",
+                    "showOnPages": { "kind": "all" },
+                    "defaultValue": { "kind": "dynamic", "count": 1, "unit": "hours" }
+                },
+                {
+                    "kind": "string",
+                    "selectionType": "freetext",
+                    "showOnPages": { "kind": "all" },
+                    "id": "dfead7a4-9b5e-4ef9-aa4e-3261da582c0c",
+                    "displayName": "freetext",
+                    "description": "freetext description",
+                    "variableName": "freetext",
+                    "defaultValue": { "kind": "all" }
+                },
+                {
+                    "kind": "dataSource",
+                    "id": "301dbe98-8398-48b2-82fe-da1f0e043a4f",
+                    "displayName": "dataSourceParameter",
+                    "description": "dataSourceParameterDescription",
+                    "defaultValue": { "kind": "dataSource", "dataSourceId": "948a1125-b162-4e15-9833-5bba312e1225" },
+                    "dataSource": { "kind": "dataSource", "values": { "kind": "all" } },
+                    "showOnPages": { "kind": "all" }
+                }
+            ]
+        },
+        "queries": {
+            "type": "array",
+            "description": "An array of query objects",
+            "items": { "$ref": "query.json#/properties/query" }
+        },
+        "embeddedApps": {
+            "type": "array",
+            "description": "An array of embedded app objects",
+            "items": { "$ref": "embeddedApp.json#/properties/embeddedApp" },
+            "examples": [{ "id": "f411e9ed-fe75-4762-82da-9c430c184afb", "url": "https://example.com/app" }]
+        }
+    },
+    "required": [
+        "schema_version",
+        "tiles",
+        "baseQueries",
+        "parameters",
+        "dataSources",
+        "pages",
+        "queries",
+        "embeddedApps"
+    ],
+    "$defs": {
+        "populatedString": {
+            "type": "string",
+            "allOf": [
+                { "pattern": "[^\\s]+", "errorMessage": { "pattern": "Must contains at least 1 non-space character" } },
+                { "pattern": "^[^\\n\\r]*$", "errorMessage": { "pattern": "Must not contain newlines" } }
+            ]
+        },
+        "uuid": {
+            "type": "string",
+            "description": "RFC 4122 uuid https://datatracker.ietf.org/doc/html/rfc4122",
+            "format": "uuid",
+            "examples": ["55743aeb-468f-4db3-aa26-4c4b298f0353"],
+            "errorMessage": {
+                "format": "Needs to follow the UUID format as defined by RFC 4122 (https://datatracker.ietf.org/doc/html/rfc4122). Example: 3e4666bf-d5e5-4aa7-b8ce-cefe41c7568a"
+            }
+        },
+        "variableName": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1024,
+            "errorMessage": {
+                "pattern": "Must be a valid Kusto variable. See https://docs.microsoft.com/en-us/kusto/query/schema-entities/entity-names for more information."
+            },
+            "allOf": [
+                { "pattern": "^[ a-zA-Z0-9._-]+$" },
+                { "pattern": "^(?!__)" },
+                { "pattern": ".*(?<!__)$" },
+                { "pattern": "[^ ]" }
+            ]
+        },
+        "basicParamType": { "enum": ["string", "real", "decimal", "int", "bool", "datetime", "long"] }
+    }
+}

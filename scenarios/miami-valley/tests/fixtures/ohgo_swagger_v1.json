@@ -1,0 +1,3765 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "Swagger",
+    "description": "This documentation allows for testing the API features. <br/>To start, <a href=\"/docs/registration\">register</a> for an API key.Once registration is complete, take your API key and enter it in the top right input box of this page. <br/>Select endpoint name to open the implementation notes. Click the <b>Try it out!</b> button to execute the current endpoint.Once you are comfortable with this, try the filter parameters.",
+    "version": "v1"
+  },
+  "paths": {
+    "/api/v1/cameras": {
+      "get": {
+        "tags": [
+          "Cameras"
+        ],
+        "summary": "Get all cameras",
+        "description": "Data can be filtered using optional query parameters.\r\n\r\nSee the paramters section.\r\n\r\n<a href=\"/docs/v1/cameras\">Cameras</a> Documentation\r\n",
+        "parameters": [
+          {
+            "name": "map-bounds-sw",
+            "in": "query",
+            "description": "Filter Parameter: <br/>South west map bounds as two double values separated by comma (longitude,latitude) <br/>Requires filter [map-bounds-ne] to complete the bounding box. <br/><br/>e.g. map-bounds-sw=41.01106167071922,-82.36851259765625",
+            "style": "simple"
+          },
+          {
+            "name": "map-bounds-ne",
+            "in": "query",
+            "description": "Filter Parameter: <br/>North east map bounds as two double values separated by comma (longitude,latitude) <br/>Requires filter [map-bounds-sw] to complete the bounding box. <br/><br/>e.g. map-bounds-ne=41.01106167071922,-82.36851259765625",
+            "style": "simple"
+          },
+          {
+            "name": "region",
+            "in": "query",
+            "description": "Filter Parameter: <br/>Name of the region you want to pull results for <br/>Can send multiple regions comma separated <br/><br/>Valid values are <br/>akron, central-ohio, cincinnati, cleveland, columbus, dayton, ne-ohio, nw-ohio, se-ohio, sw-ohio, toledo <br/><br/>e.g. region=ne-ohio <br/>e.g. region=cleveland,akron",
+            "style": "simple"
+          },
+          {
+            "name": "radius",
+            "in": "query",
+            "description": "Filter Parameter: <br/>Returns results within the radius of a lat long point. <br/>Values are latitude,longitude,miles from center point. <br/><br/>e.g. radius=41.01106167071922,-82.36851259765625,3",
+            "style": "simple"
+          },
+          {
+            "name": "page-size",
+            "in": "query",
+            "description": "Filter Parameter: <br>Sets maximum number records to return from the API request. <br/>If filter [page-size] not sent and [page-all] not sent then default page-size is 500. <br/><br/>e.g. page-size=50",
+            "style": "simple",
+            "schema": {
+              "type": "integer",
+              "example": 5
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Filter Parameter: <br>Skips a set of results based on page size and returns the next set of results from the API request. <br/>Skip [page-size] * [page] and returns [page-size] of results. <br/>If filter [page-size] not sent and [page-all] not sent then default page-size is 500. <br/><br/>e.g. page=5",
+            "style": "simple"
+          },
+          {
+            "name": "page-all",
+            "in": "query",
+            "description": "Filter Parameter: <br>Ignores paging parameters and returns all data from a result set. <br/>This does not discard other filters such as region and map bounds. <br/>Valid values are <br/>true, yes, y, 1 <br/><br/>e.g. page-all=true",
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/CameraApiResult"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CameraApiResult"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CameraApiResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/cameras/{id}": {
+      "get": {
+        "tags": [
+          "Cameras"
+        ],
+        "summary": "Get cameras by unique id.",
+        "description": "Request will return matching camera data or a 404 (Not Found Error).\r\n\r\nYou can send multiple ids comma separated.\r\n\r\n<a href=\"/docs/v1/cameras\">Cameras</a> Documentation",
+        "operationId": "cameras",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Unique identifier for the camera",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "map-bounds-sw",
+            "in": "query",
+            "description": "Filter Parameter: <br/>South west map bounds as two double values separated by comma (longitude,latitude) <br/>Requires filter [map-bounds-ne] to complete the bounding box. <br/><br/>e.g. map-bounds-sw=41.01106167071922,-82.36851259765625",
+            "style": "simple"
+          },
+          {
+            "name": "map-bounds-ne",
+            "in": "query",
+            "description": "Filter Parameter: <br/>North east map bounds as two double values separated by comma (longitude,latitude) <br/>Requires filter [map-bounds-sw] to complete the bounding box. <br/><br/>e.g. map-bounds-ne=41.01106167071922,-82.36851259765625",
+            "style": "simple"
+          },
+          {
+            "name": "region",
+            "in": "query",
+            "description": "Filter Parameter: <br/>Name of the region you want to pull results for <br/>Can send multiple regions comma separated <br/><br/>Valid values are <br/>akron, central-ohio, cincinnati, cleveland, columbus, dayton, ne-ohio, nw-ohio, se-ohio, sw-ohio, toledo <br/><br/>e.g. region=ne-ohio <br/>e.g. region=cleveland,akron",
+            "style": "simple"
+          },
+          {
+            "name": "radius",
+            "in": "query",
+            "description": "Filter Parameter: <br/>Returns results within the radius of a lat long point. <br/>Values are latitude,longitude,miles from center point. <br/><br/>e.g. radius=41.01106167071922,-82.36851259765625,3",
+            "style": "simple"
+          },
+          {
+            "name": "page-size",
+            "in": "query",
+            "description": "Filter Parameter: <br>Sets maximum number records to return from the API request. <br/>If filter [page-size] not sent and [page-all] not sent then default page-size is 500. <br/><br/>e.g. page-size=50",
+            "style": "simple",
+            "schema": {
+              "type": "integer",
+              "example": 5
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Filter Parameter: <br>Skips a set of results based on page size and returns the next set of results from the API request. <br/>Skip [page-size] * [page] and returns [page-size] of results. <br/>If filter [page-size] not sent and [page-all] not sent then default page-size is 500. <br/><br/>e.g. page=5",
+            "style": "simple"
+          },
+          {
+            "name": "page-all",
+            "in": "query",
+            "description": "Filter Parameter: <br>Ignores paging parameters and returns all data from a result set. <br/>This does not discard other filters such as region and map bounds. <br/>Valid values are <br/>true, yes, y, 1 <br/><br/>e.g. page-all=true",
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/CameraApiResult"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CameraApiResult"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CameraApiResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/construction": {
+      "get": {
+        "tags": [
+          "Construction"
+        ],
+        "summary": "Get all construction",
+        "description": "Data can be filtered using optional query parameters.\r\n\r\nSee the paramters section.\r\n\r\n<a href=\"/docs/v1/construction\">Construction</a> Documentation",
+        "parameters": [
+          {
+            "name": "map-bounds-sw",
+            "in": "query",
+            "description": "Filter Parameter: <br/>South west map bounds as two double values separated by comma (longitude,latitude) <br/>Requires filter [map-bounds-ne] to complete the bounding box. <br/><br/>e.g. map-bounds-sw=41.01106167071922,-82.36851259765625",
+            "style": "simple"
+          },
+          {
+            "name": "map-bounds-ne",
+            "in": "query",
+            "description": "Filter Parameter: <br/>North east map bounds as two double values separated by comma (longitude,latitude) <br/>Requires filter [map-bounds-sw] to complete the bounding box. <br/><br/>e.g. map-bounds-ne=41.01106167071922,-82.36851259765625",
+            "style": "simple"
+          },
+          {
+            "name": "region",
+            "in": "query",
+            "description": "Filter Parameter: <br/>Name of the region you want to pull results for <br/>Can send multiple regions comma separated <br/><br/>Valid values are <br/>akron, central-ohio, cincinnati, cleveland, columbus, dayton, ne-ohio, nw-ohio, se-ohio, sw-ohio, toledo <br/><br/>e.g. region=ne-ohio <br/>e.g. region=cleveland,akron",
+            "style": "simple"
+          },
+          {
+            "name": "radius",
+            "in": "query",
+            "description": "Filter Parameter: <br/>Returns results within the radius of a lat long point. <br/>Values are latitude,longitude,miles from center point. <br/><br/>e.g. radius=41.01106167071922,-82.36851259765625,3",
+            "style": "simple"
+          },
+          {
+            "name": "page-size",
+            "in": "query",
+            "description": "Filter Parameter: <br>Sets maximum number records to return from the API request. <br/>If filter [page-size] not sent and [page-all] not sent then default page-size is 500. <br/><br/>e.g. page-size=50",
+            "style": "simple",
+            "schema": {
+              "type": "integer",
+              "example": 5
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Filter Parameter: <br>Skips a set of results based on page size and returns the next set of results from the API request. <br/>Skip [page-size] * [page] and returns [page-size] of results. <br/>If filter [page-size] not sent and [page-all] not sent then default page-size is 500. <br/><br/>e.g. page=5",
+            "style": "simple"
+          },
+          {
+            "name": "page-all",
+            "in": "query",
+            "description": "Filter Parameter: <br>Ignores paging parameters and returns all data from a result set. <br/>This does not discard other filters such as region and map bounds. <br/>Valid values are <br/>true, yes, y, 1 <br/><br/>e.g. page-all=true",
+            "style": "simple"
+          },
+          {
+            "name": "include-future",
+            "in": "query",
+            "description": "Filter Parameter: <br/>Allows you to view current construction and planned construction up to future date <br/>Date should be sent as yyyy-MM-dd <br/><br/>e.g. include-future=2026-11-09",
+            "style": "simple"
+          },
+          {
+            "name": "future-only",
+            "in": "query",
+            "description": "Filter Parameter: <br/>Allows you to view planned construction starting tomorrow up to the future date <br/>Date should be sent as yyyy-MM-dd<br/><br/>e.g. future-only=2026-11-09",
+            "style": "simple"
+          },
+          {
+            "name": "exclude-work-zone",
+            "in": "query",
+            "description": "Filter Parameter: <br/>Allows you to exclude work zone details from your construction response. <br/>Reduces the response payload if this data is not required.",
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConstructionApiResult"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConstructionApiResult"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConstructionApiResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/construction/{id}": {
+      "get": {
+        "tags": [
+          "Construction"
+        ],
+        "summary": "Get construction by unique id.",
+        "description": "Request will return matching consturction points or a 404 (Not Found Error).\r\n\r\nYou can send multiple ids comma separated.\r\n\r\n<a href=\"/docs/v1/construction\">Construction</a> Documentation",
+        "operationId": "construction",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Unique identifier for the construction",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "map-bounds-sw",
+            "in": "query",
+            "description": "Filter Parameter: <br/>South west map bounds as two double values separated by comma (longitude,latitude) <br/>Requires filter [map-bounds-ne] to complete the bounding box. <br/><br/>e.g. map-bounds-sw=41.01106167071922,-82.36851259765625",
+            "style": "simple"
+          },
+          {
+            "name": "map-bounds-ne",
+            "in": "query",
+            "description": "Filter Parameter: <br/>North east map bounds as two double values separated by comma (longitude,latitude) <br/>Requires filter [map-bounds-sw] to complete the bounding box. <br/><br/>e.g. map-bounds-ne=41.01106167071922,-82.36851259765625",
+            "style": "simple"
+          },
+          {
+            "name": "region",
+            "in": "query",
+            "description": "Filter Parameter: <br/>Name of the region you want to pull results for <br/>Can send multiple regions comma separated <br/><br/>Valid values are <br/>akron, central-ohio, cincinnati, cleveland, columbus, dayton, ne-ohio, nw-ohio, se-ohio, sw-ohio, toledo <br/><br/>e.g. region=ne-ohio <br/>e.g. region=cleveland,akron",
+            "style": "simple"
+          },
+          {
+            "name": "radius",
+            "in": "query",
+            "description": "Filter Parameter: <br/>Returns results within the radius of a lat long point. <br/>Values are latitude,longitude,miles from center point. <br/><br/>e.g. radius=41.01106167071922,-82.36851259765625,3",
+            "style": "simple"
+          },
+          {
+            "name": "page-size",
+            "in": "query",
+            "description": "Filter Parameter: <br>Sets maximum number records to return from the API request. <br/>If filter [page-size] not sent and [page-all] not sent then default page-size is 500. <br/><br/>e.g. page-size=50",
+            "style": "simple",
+            "schema": {
+              "type": "integer",
+              "example": 5
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Filter Parameter: <br>Skips a set of results based on page size and returns the next set of results from the API request. <br/>Skip [page-size] * [page] and returns [page-size] of results. <br/>If filter [page-size] not sent and [page-all] not sent then default page-size is 500. <br/><br/>e.g. page=5",
+            "style": "simple"
+          },
+          {
+            "name": "page-all",
+            "in": "query",
+            "description": "Filter Parameter: <br>Ignores paging parameters and returns all data from a result set. <br/>This does not discard other filters such as region and map bounds. <br/>Valid values are <br/>true, yes, y, 1 <br/><br/>e.g. page-all=true",
+            "style": "simple"
+          },
+          {
+            "name": "include-future",
+            "in": "query",
+            "description": "Filter Parameter: <br/>Allows you to view current construction and planned construction up to future date <br/>Date should be sent as yyyy-MM-dd <br/><br/>e.g. include-future=2026-11-09",
+            "style": "simple"
+          },
+          {
+            "name": "future-only",
+            "in": "query",
+            "description": "Filter Parameter: <br/>Allows you to view planned construction starting tomorrow up to the future date <br/>Date should be sent as yyyy-MM-dd<br/><br/>e.g. future-only=2026-11-09",
+            "style": "simple"
+          },
+          {
+            "name": "exclude-work-zone",
+            "in": "query",
+            "description": "Filter Parameter: <br/>Allows you to exclude work zone details from your construction response. <br/>Reduces the response payload if this data is not required.",
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConstructionApiResult"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConstructionApiResult"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConstructionApiResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/construction/{id}/work-zone/{workZoneId}": {
+      "get": {
+        "tags": [
+          "Construction"
+        ],
+        "summary": "Get work zone data by construction id and work zone id.",
+        "description": "Request will return matching work zone data or a 404 (Not Found Error).\r\n\r\nYou can send multiple ids comma separated.\r\n\r\n<a href=\"/docs/v1/construction\">Construction and WorkZone</a> Documentation",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "workZoneId",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "map-bounds-sw",
+            "in": "query",
+            "description": "Filter Parameter: <br/>South west map bounds as two double values separated by comma (longitude,latitude) <br/>Requires filter [map-bounds-ne] to complete the bounding box. <br/><br/>e.g. map-bounds-sw=41.01106167071922,-82.36851259765625",
+            "style": "simple"
+          },
+          {
+            "name": "map-bounds-ne",
+            "in": "query",
+            "description": "Filter Parameter: <br/>North east map bounds as two double values separated by comma (longitude,latitude) <br/>Requires filter [map-bounds-sw] to complete the bounding box. <br/><br/>e.g. map-bounds-ne=41.01106167071922,-82.36851259765625",
+            "style": "simple"
+          },
+          {
+            "name": "region",
+            "in": "query",
+            "description": "Filter Parameter: <br/>Name of the region you want to pull results for <br/>Can send multiple regions comma separated <br/><br/>Valid values are <br/>akron, central-ohio, cincinnati, cleveland, columbus, dayton, ne-ohio, nw-ohio, se-ohio, sw-ohio, toledo <br/><br/>e.g. region=ne-ohio <br/>e.g. region=cleveland,akron",
+            "style": "simple"
+          },
+          {
+            "name": "radius",
+            "in": "query",
+            "description": "Filter Parameter: <br/>Returns results within the radius of a lat long point. <br/>Values are latitude,longitude,miles from center point. <br/><br/>e.g. radius=41.01106167071922,-82.36851259765625,3",
+            "style": "simple"
+          },
+          {
+            "name": "page-size",
+            "in": "query",
+            "description": "Filter Parameter: <br>Sets maximum number records to return from the API request. <br/>If filter [page-size] not sent and [page-all] not sent then default page-size is 500. <br/><br/>e.g. page-size=50",
+            "style": "simple",
+            "schema": {
+              "type": "integer",
+              "example": 5
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Filter Parameter: <br>Skips a set of results based on page size and returns the next set of results from the API request. <br/>Skip [page-size] * [page] and returns [page-size] of results. <br/>If filter [page-size] not sent and [page-all] not sent then default page-size is 500. <br/><br/>e.g. page=5",
+            "style": "simple"
+          },
+          {
+            "name": "page-all",
+            "in": "query",
+            "description": "Filter Parameter: <br>Ignores paging parameters and returns all data from a result set. <br/>This does not discard other filters such as region and map bounds. <br/>Valid values are <br/>true, yes, y, 1 <br/><br/>e.g. page-all=true",
+            "style": "simple"
+          },
+          {
+            "name": "include-future",
+            "in": "query",
+            "description": "Filter Parameter: <br/>Allows you to view current construction and planned construction up to future date <br/>Date should be sent as yyyy-MM-dd <br/><br/>e.g. include-future=2026-11-09",
+            "style": "simple"
+          },
+          {
+            "name": "future-only",
+            "in": "query",
+            "description": "Filter Parameter: <br/>Allows you to view planned construction starting tomorrow up to the future date <br/>Date should be sent as yyyy-MM-dd<br/><br/>e.g. future-only=2026-11-09",
+            "style": "simple"
+          },
+          {
+            "name": "exclude-work-zone",
+            "in": "query",
+            "description": "Filter Parameter: <br/>Allows you to exclude work zone details from your construction response. <br/>Reduces the response payload if this data is not required.",
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConstructionDetourDataApiResult"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConstructionDetourDataApiResult"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConstructionDetourDataApiResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/dangerous-slowdowns": {
+      "get": {
+        "tags": [
+          "Dangerous Slowdowns"
+        ],
+        "summary": "Get all dangerous slowdowns",
+        "description": "Data can be filtered using optional query parameters.\r\n\r\nSee the paramters section.\r\n\r\n<a href=\"/docs/v1/dangerous-slowdowns\">Dangerous Slowdowns</a> Documentation",
+        "parameters": [
+          {
+            "name": "map-bounds-sw",
+            "in": "query",
+            "description": "Filter Parameter: <br/>South west map bounds as two double values separated by comma (longitude,latitude) <br/>Requires filter [map-bounds-ne] to complete the bounding box. <br/><br/>e.g. map-bounds-sw=41.01106167071922,-82.36851259765625",
+            "style": "simple"
+          },
+          {
+            "name": "map-bounds-ne",
+            "in": "query",
+            "description": "Filter Parameter: <br/>North east map bounds as two double values separated by comma (longitude,latitude) <br/>Requires filter [map-bounds-sw] to complete the bounding box. <br/><br/>e.g. map-bounds-ne=41.01106167071922,-82.36851259765625",
+            "style": "simple"
+          },
+          {
+            "name": "region",
+            "in": "query",
+            "description": "Filter Parameter: <br/>Name of the region you want to pull results for <br/>Can send multiple regions comma separated <br/><br/>Valid values are <br/>akron, central-ohio, cincinnati, cleveland, columbus, dayton, ne-ohio, nw-ohio, se-ohio, sw-ohio, toledo <br/><br/>e.g. region=ne-ohio <br/>e.g. region=cleveland,akron",
+            "style": "simple"
+          },
+          {
+            "name": "radius",
+            "in": "query",
+            "description": "Filter Parameter: <br/>Returns results within the radius of a lat long point. <br/>Values are latitude,longitude,miles from center point. <br/><br/>e.g. radius=41.01106167071922,-82.36851259765625,3",
+            "style": "simple"
+          },
+          {
+            "name": "page-size",
+            "in": "query",
+            "description": "Filter Parameter: <br>Sets maximum number records to return from the API request. <br/>If filter [page-size] not sent and [page-all] not sent then default page-size is 500. <br/><br/>e.g. page-size=50",
+            "style": "simple",
+            "schema": {
+              "type": "integer",
+              "example": 5
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Filter Parameter: <br>Skips a set of results based on page size and returns the next set of results from the API request. <br/>Skip [page-size] * [page] and returns [page-size] of results. <br/>If filter [page-size] not sent and [page-all] not sent then default page-size is 500. <br/><br/>e.g. page=5",
+            "style": "simple"
+          },
+          {
+            "name": "page-all",
+            "in": "query",
+            "description": "Filter Parameter: <br>Ignores paging parameters and returns all data from a result set. <br/>This does not discard other filters such as region and map bounds. <br/>Valid values are <br/>true, yes, y, 1 <br/><br/>e.g. page-all=true",
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/DangerousSlowdownApiResult"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DangerousSlowdownApiResult"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DangerousSlowdownApiResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/dangerous-slowdowns/{id}": {
+      "get": {
+        "tags": [
+          "Dangerous Slowdowns"
+        ],
+        "summary": "Get dangerous slowdowns by unique id.",
+        "description": "Request will return matching dangerous slowdown data or a 404 (Not Found Error).\r\n\r\nYou can send multiple ids comma separated.\r\n\r\n<a href=\"/docs/v1/dangerous-slowdowns\">Dangerous Slowdown</a> Documentation",
+        "operationId": "dangerous-slowdowns",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Unique identifier for the dangerous slowdown",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "map-bounds-sw",
+            "in": "query",
+            "description": "Filter Parameter: <br/>South west map bounds as two double values separated by comma (longitude,latitude) <br/>Requires filter [map-bounds-ne] to complete the bounding box. <br/><br/>e.g. map-bounds-sw=41.01106167071922,-82.36851259765625",
+            "style": "simple"
+          },
+          {
+            "name": "map-bounds-ne",
+            "in": "query",
+            "description": "Filter Parameter: <br/>North east map bounds as two double values separated by comma (longitude,latitude) <br/>Requires filter [map-bounds-sw] to complete the bounding box. <br/><br/>e.g. map-bounds-ne=41.01106167071922,-82.36851259765625",
+            "style": "simple"
+          },
+          {
+            "name": "region",
+            "in": "query",
+            "description": "Filter Parameter: <br/>Name of the region you want to pull results for <br/>Can send multiple regions comma separated <br/><br/>Valid values are <br/>akron, central-ohio, cincinnati, cleveland, columbus, dayton, ne-ohio, nw-ohio, se-ohio, sw-ohio, toledo <br/><br/>e.g. region=ne-ohio <br/>e.g. region=cleveland,akron",
+            "style": "simple"
+          },
+          {
+            "name": "radius",
+            "in": "query",
+            "description": "Filter Parameter: <br/>Returns results within the radius of a lat long point. <br/>Values are latitude,longitude,miles from center point. <br/><br/>e.g. radius=41.01106167071922,-82.36851259765625,3",
+            "style": "simple"
+          },
+          {
+            "name": "page-size",
+            "in": "query",
+            "description": "Filter Parameter: <br>Sets maximum number records to return from the API request. <br/>If filter [page-size] not sent and [page-all] not sent then default page-size is 500. <br/><br/>e.g. page-size=50",
+            "style": "simple",
+            "schema": {
+              "type": "integer",
+              "example": 5
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Filter Parameter: <br>Skips a set of results based on page size and returns the next set of results from the API request. <br/>Skip [page-size] * [page] and returns [page-size] of results. <br/>If filter [page-size] not sent and [page-all] not sent then default page-size is 500. <br/><br/>e.g. page=5",
+            "style": "simple"
+          },
+          {
+            "name": "page-all",
+            "in": "query",
+            "description": "Filter Parameter: <br>Ignores paging parameters and returns all data from a result set. <br/>This does not discard other filters such as region and map bounds. <br/>Valid values are <br/>true, yes, y, 1 <br/><br/>e.g. page-all=true",
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/DangerousSlowdownApiResult"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DangerousSlowdownApiResult"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DangerousSlowdownApiResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/digital-signs": {
+      "get": {
+        "tags": [
+          "Digital Signs"
+        ],
+        "summary": "Get all digital signs",
+        "description": "Data can be filtered using optional query parameters.\r\n\r\nSee the paramters section.\r\n\r\n<a href=\"/docs/v1/digital-signs\">Digital Signs</a> Documentation",
+        "parameters": [
+          {
+            "name": "map-bounds-sw",
+            "in": "query",
+            "description": "Filter Parameter: <br/>South west map bounds as two double values separated by comma (longitude,latitude) <br/>Requires filter [map-bounds-ne] to complete the bounding box. <br/><br/>e.g. map-bounds-sw=41.01106167071922,-82.36851259765625",
+            "style": "simple"
+          },
+          {
+            "name": "map-bounds-ne",
+            "in": "query",
+            "description": "Filter Parameter: <br/>North east map bounds as two double values separated by comma (longitude,latitude) <br/>Requires filter [map-bounds-sw] to complete the bounding box. <br/><br/>e.g. map-bounds-ne=41.01106167071922,-82.36851259765625",
+            "style": "simple"
+          },
+          {
+            "name": "region",
+            "in": "query",
+            "description": "Filter Parameter: <br/>Name of the region you want to pull results for <br/>Can send multiple regions comma separated <br/><br/>Valid values are <br/>akron, central-ohio, cincinnati, cleveland, columbus, dayton, ne-ohio, nw-ohio, se-ohio, sw-ohio, toledo <br/><br/>e.g. region=ne-ohio <br/>e.g. region=cleveland,akron",
+            "style": "simple"
+          },
+          {
+            "name": "radius",
+            "in": "query",
+            "description": "Filter Parameter: <br/>Returns results within the radius of a lat long point. <br/>Values are latitude,longitude,miles from center point. <br/><br/>e.g. radius=41.01106167071922,-82.36851259765625,3",
+            "style": "simple"
+          },
+          {
+            "name": "page-size",
+            "in": "query",
+            "description": "Filter Parameter: <br>Sets maximum number records to return from the API request. <br/>If filter [page-size] not sent and [page-all] not sent then default page-size is 500. <br/><br/>e.g. page-size=50",
+            "style": "simple",
+            "schema": {
+              "type": "integer",
+              "example": 5
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Filter Parameter: <br>Skips a set of results based on page size and returns the next set of results from the API request. <br/>Skip [page-size] * [page] and returns [page-size] of results. <br/>If filter [page-size] not sent and [page-all] not sent then default page-size is 500. <br/><br/>e.g. page=5",
+            "style": "simple"
+          },
+          {
+            "name": "page-all",
+            "in": "query",
+            "description": "Filter Parameter: <br>Ignores paging parameters and returns all data from a result set. <br/>This does not discard other filters such as region and map bounds. <br/>Valid values are <br/>true, yes, y, 1 <br/><br/>e.g. page-all=true",
+            "style": "simple"
+          },
+          {
+            "name": "sign-type",
+            "in": "query",
+            "description": "Filter Parameter: <br/>Filters out signs by sign-type <br/>Can send multiple signs-types comma separated <br/><br/>Valid values are <br/>(dms or message-board), (ddms or travel-time), (sign-queue or slow-traffic), (vsl or variable-speed-limit) <br/><br/>e.g. sign-type=message-board <br/>e.g. sign-type=dms,ddms",
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/DigitalSignApiResult"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DigitalSignApiResult"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DigitalSignApiResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/digital-signs/{id}": {
+      "get": {
+        "tags": [
+          "Digital Signs"
+        ],
+        "summary": "Get digital signs by unique id.",
+        "description": "Request will return matching digital-signs data or a 404 (Not Found Error).\r\n\r\nYou can send multiple ids comma separated.\r\n\r\n<a href=\"/docs/v1/digital-signs\">Digital Signs</a> Documentation",
+        "operationId": "digital-signs",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Unique identifier for the digital sign",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "map-bounds-sw",
+            "in": "query",
+            "description": "Filter Parameter: <br/>South west map bounds as two double values separated by comma (longitude,latitude) <br/>Requires filter [map-bounds-ne] to complete the bounding box. <br/><br/>e.g. map-bounds-sw=41.01106167071922,-82.36851259765625",
+            "style": "simple"
+          },
+          {
+            "name": "map-bounds-ne",
+            "in": "query",
+            "description": "Filter Parameter: <br/>North east map bounds as two double values separated by comma (longitude,latitude) <br/>Requires filter [map-bounds-sw] to complete the bounding box. <br/><br/>e.g. map-bounds-ne=41.01106167071922,-82.36851259765625",
+            "style": "simple"
+          },
+          {
+            "name": "region",
+            "in": "query",
+            "description": "Filter Parameter: <br/>Name of the region you want to pull results for <br/>Can send multiple regions comma separated <br/><br/>Valid values are <br/>akron, central-ohio, cincinnati, cleveland, columbus, dayton, ne-ohio, nw-ohio, se-ohio, sw-ohio, toledo <br/><br/>e.g. region=ne-ohio <br/>e.g. region=cleveland,akron",
+            "style": "simple"
+          },
+          {
+            "name": "radius",
+            "in": "query",
+            "description": "Filter Parameter: <br/>Returns results within the radius of a lat long point. <br/>Values are latitude,longitude,miles from center point. <br/><br/>e.g. radius=41.01106167071922,-82.36851259765625,3",
+            "style": "simple"
+          },
+          {
+            "name": "page-size",
+            "in": "query",
+            "description": "Filter Parameter: <br>Sets maximum number records to return from the API request. <br/>If filter [page-size] not sent and [page-all] not sent then default page-size is 500. <br/><br/>e.g. page-size=50",
+            "style": "simple",
+            "schema": {
+              "type": "integer",
+              "example": 5
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Filter Parameter: <br>Skips a set of results based on page size and returns the next set of results from the API request. <br/>Skip [page-size] * [page] and returns [page-size] of results. <br/>If filter [page-size] not sent and [page-all] not sent then default page-size is 500. <br/><br/>e.g. page=5",
+            "style": "simple"
+          },
+          {
+            "name": "page-all",
+            "in": "query",
+            "description": "Filter Parameter: <br>Ignores paging parameters and returns all data from a result set. <br/>This does not discard other filters such as region and map bounds. <br/>Valid values are <br/>true, yes, y, 1 <br/><br/>e.g. page-all=true",
+            "style": "simple"
+          },
+          {
+            "name": "sign-type",
+            "in": "query",
+            "description": "Filter Parameter: <br/>Filters out signs by sign-type <br/>Can send multiple signs-types comma separated <br/><br/>Valid values are <br/>(dms or message-board), (ddms or travel-time), (sign-queue or slow-traffic), (vsl or variable-speed-limit) <br/><br/>e.g. sign-type=message-board <br/>e.g. sign-type=dms,ddms",
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/DigitalSignApiResult"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DigitalSignApiResult"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DigitalSignApiResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/incidents": {
+      "get": {
+        "tags": [
+          "Incidents"
+        ],
+        "summary": "Get all incidents",
+        "description": "Data can be filtered using optional query parameters.\r\n\r\nSee the paramters section.\r\n\r\n<a href=\"/docs/v1/incidents\">Incidents</a> Documentation",
+        "parameters": [
+          {
+            "name": "map-bounds-sw",
+            "in": "query",
+            "description": "Filter Parameter: <br/>South west map bounds as two double values separated by comma (longitude,latitude) <br/>Requires filter [map-bounds-ne] to complete the bounding box. <br/><br/>e.g. map-bounds-sw=41.01106167071922,-82.36851259765625",
+            "style": "simple"
+          },
+          {
+            "name": "map-bounds-ne",
+            "in": "query",
+            "description": "Filter Parameter: <br/>North east map bounds as two double values separated by comma (longitude,latitude) <br/>Requires filter [map-bounds-sw] to complete the bounding box. <br/><br/>e.g. map-bounds-ne=41.01106167071922,-82.36851259765625",
+            "style": "simple"
+          },
+          {
+            "name": "region",
+            "in": "query",
+            "description": "Filter Parameter: <br/>Name of the region you want to pull results for <br/>Can send multiple regions comma separated <br/><br/>Valid values are <br/>akron, central-ohio, cincinnati, cleveland, columbus, dayton, ne-ohio, nw-ohio, se-ohio, sw-ohio, toledo <br/><br/>e.g. region=ne-ohio <br/>e.g. region=cleveland,akron",
+            "style": "simple"
+          },
+          {
+            "name": "radius",
+            "in": "query",
+            "description": "Filter Parameter: <br/>Returns results within the radius of a lat long point. <br/>Values are latitude,longitude,miles from center point. <br/><br/>e.g. radius=41.01106167071922,-82.36851259765625,3",
+            "style": "simple"
+          },
+          {
+            "name": "page-size",
+            "in": "query",
+            "description": "Filter Parameter: <br>Sets maximum number records to return from the API request. <br/>If filter [page-size] not sent and [page-all] not sent then default page-size is 500. <br/><br/>e.g. page-size=50",
+            "style": "simple",
+            "schema": {
+              "type": "integer",
+              "example": 5
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Filter Parameter: <br>Skips a set of results based on page size and returns the next set of results from the API request. <br/>Skip [page-size] * [page] and returns [page-size] of results. <br/>If filter [page-size] not sent and [page-all] not sent then default page-size is 500. <br/><br/>e.g. page=5",
+            "style": "simple"
+          },
+          {
+            "name": "page-all",
+            "in": "query",
+            "description": "Filter Parameter: <br>Ignores paging parameters and returns all data from a result set. <br/>This does not discard other filters such as region and map bounds. <br/>Valid values are <br/>true, yes, y, 1 <br/><br/>e.g. page-all=true",
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/IncidentApiResult"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IncidentApiResult"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IncidentApiResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/incidents/{id}": {
+      "get": {
+        "tags": [
+          "Incidents"
+        ],
+        "summary": "Get incidents by unique id.",
+        "description": "Request will return matching incidents data or a 404 (Not Found Error).\r\n\r\nYou can send multiple ids comma separated.\r\n\r\n<a href=\"/docs/v1/incidents\">Incidents</a> Documentation",
+        "operationId": "incidents",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Unique identifier for the incident",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "map-bounds-sw",
+            "in": "query",
+            "description": "Filter Parameter: <br/>South west map bounds as two double values separated by comma (longitude,latitude) <br/>Requires filter [map-bounds-ne] to complete the bounding box. <br/><br/>e.g. map-bounds-sw=41.01106167071922,-82.36851259765625",
+            "style": "simple"
+          },
+          {
+            "name": "map-bounds-ne",
+            "in": "query",
+            "description": "Filter Parameter: <br/>North east map bounds as two double values separated by comma (longitude,latitude) <br/>Requires filter [map-bounds-sw] to complete the bounding box. <br/><br/>e.g. map-bounds-ne=41.01106167071922,-82.36851259765625",
+            "style": "simple"
+          },
+          {
+            "name": "region",
+            "in": "query",
+            "description": "Filter Parameter: <br/>Name of the region you want to pull results for <br/>Can send multiple regions comma separated <br/><br/>Valid values are <br/>akron, central-ohio, cincinnati, cleveland, columbus, dayton, ne-ohio, nw-ohio, se-ohio, sw-ohio, toledo <br/><br/>e.g. region=ne-ohio <br/>e.g. region=cleveland,akron",
+            "style": "simple"
+          },
+          {
+            "name": "radius",
+            "in": "query",
+            "description": "Filter Parameter: <br/>Returns results within the radius of a lat long point. <br/>Values are latitude,longitude,miles from center point. <br/><br/>e.g. radius=41.01106167071922,-82.36851259765625,3",
+            "style": "simple"
+          },
+          {
+            "name": "page-size",
+            "in": "query",
+            "description": "Filter Parameter: <br>Sets maximum number records to return from the API request. <br/>If filter [page-size] not sent and [page-all] not sent then default page-size is 500. <br/><br/>e.g. page-size=50",
+            "style": "simple",
+            "schema": {
+              "type": "integer",
+              "example": 5
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Filter Parameter: <br>Skips a set of results based on page size and returns the next set of results from the API request. <br/>Skip [page-size] * [page] and returns [page-size] of results. <br/>If filter [page-size] not sent and [page-all] not sent then default page-size is 500. <br/><br/>e.g. page=5",
+            "style": "simple"
+          },
+          {
+            "name": "page-all",
+            "in": "query",
+            "description": "Filter Parameter: <br>Ignores paging parameters and returns all data from a result set. <br/>This does not discard other filters such as region and map bounds. <br/>Valid values are <br/>true, yes, y, 1 <br/><br/>e.g. page-all=true",
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/IncidentApiResult"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IncidentApiResult"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IncidentApiResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/travel-delays": {
+      "get": {
+        "tags": [
+          "Travel Delays"
+        ],
+        "summary": "Get all travel delays",
+        "description": "Data can be filtered using optional query parameters.\r\n\r\nSee the paramters section.\r\n\r\n<a href=\"/docs/v1/travel-delays\">Travel Delays</a> Documentation",
+        "parameters": [
+          {
+            "name": "map-bounds-sw",
+            "in": "query",
+            "description": "Filter Parameter: <br/>South west map bounds as two double values separated by comma (longitude,latitude) <br/>Requires filter [map-bounds-ne] to complete the bounding box. <br/><br/>e.g. map-bounds-sw=41.01106167071922,-82.36851259765625",
+            "style": "simple"
+          },
+          {
+            "name": "map-bounds-ne",
+            "in": "query",
+            "description": "Filter Parameter: <br/>North east map bounds as two double values separated by comma (longitude,latitude) <br/>Requires filter [map-bounds-sw] to complete the bounding box. <br/><br/>e.g. map-bounds-ne=41.01106167071922,-82.36851259765625",
+            "style": "simple"
+          },
+          {
+            "name": "region",
+            "in": "query",
+            "description": "Filter Parameter: <br/>Name of the region you want to pull results for <br/>Can send multiple regions comma separated <br/><br/>Valid values are <br/>akron, central-ohio, cincinnati, cleveland, columbus, dayton, ne-ohio, nw-ohio, se-ohio, sw-ohio, toledo <br/><br/>e.g. region=ne-ohio <br/>e.g. region=cleveland,akron",
+            "style": "simple"
+          },
+          {
+            "name": "radius",
+            "in": "query",
+            "description": "Filter Parameter: <br/>Returns results within the radius of a lat long point. <br/>Values are latitude,longitude,miles from center point. <br/><br/>e.g. radius=41.01106167071922,-82.36851259765625,3",
+            "style": "simple"
+          },
+          {
+            "name": "page-size",
+            "in": "query",
+            "description": "Filter Parameter: <br>Sets maximum number records to return from the API request. <br/>If filter [page-size] not sent and [page-all] not sent then default page-size is 500. <br/><br/>e.g. page-size=50",
+            "style": "simple",
+            "schema": {
+              "type": "integer",
+              "example": 5
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Filter Parameter: <br>Skips a set of results based on page size and returns the next set of results from the API request. <br/>Skip [page-size] * [page] and returns [page-size] of results. <br/>If filter [page-size] not sent and [page-all] not sent then default page-size is 500. <br/><br/>e.g. page=5",
+            "style": "simple"
+          },
+          {
+            "name": "page-all",
+            "in": "query",
+            "description": "Filter Parameter: <br>Ignores paging parameters and returns all data from a result set. <br/>This does not discard other filters such as region and map bounds. <br/>Valid values are <br/>true, yes, y, 1 <br/><br/>e.g. page-all=true",
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/IncidentApiResult"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IncidentApiResult"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IncidentApiResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/travel-delays/{id}": {
+      "get": {
+        "tags": [
+          "Travel Delays"
+        ],
+        "summary": "Get travel delays by unique id.",
+        "description": "Request will return matching travel delay data or a 404 (Not Found Error).\r\n\r\nYou can send multiple ids comma separated.\r\n\r\n<a href=\"/docs/v1/travel-delays\">Travel Delays</a> Documentation",
+        "operationId": "travel-delays",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Unique identifier for the travel delay",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "map-bounds-sw",
+            "in": "query",
+            "description": "Filter Parameter: <br/>South west map bounds as two double values separated by comma (longitude,latitude) <br/>Requires filter [map-bounds-ne] to complete the bounding box. <br/><br/>e.g. map-bounds-sw=41.01106167071922,-82.36851259765625",
+            "style": "simple"
+          },
+          {
+            "name": "map-bounds-ne",
+            "in": "query",
+            "description": "Filter Parameter: <br/>North east map bounds as two double values separated by comma (longitude,latitude) <br/>Requires filter [map-bounds-sw] to complete the bounding box. <br/><br/>e.g. map-bounds-ne=41.01106167071922,-82.36851259765625",
+            "style": "simple"
+          },
+          {
+            "name": "region",
+            "in": "query",
+            "description": "Filter Parameter: <br/>Name of the region you want to pull results for <br/>Can send multiple regions comma separated <br/><br/>Valid values are <br/>akron, central-ohio, cincinnati, cleveland, columbus, dayton, ne-ohio, nw-ohio, se-ohio, sw-ohio, toledo <br/><br/>e.g. region=ne-ohio <br/>e.g. region=cleveland,akron",
+            "style": "simple"
+          },
+          {
+            "name": "radius",
+            "in": "query",
+            "description": "Filter Parameter: <br/>Returns results within the radius of a lat long point. <br/>Values are latitude,longitude,miles from center point. <br/><br/>e.g. radius=41.01106167071922,-82.36851259765625,3",
+            "style": "simple"
+          },
+          {
+            "name": "page-size",
+            "in": "query",
+            "description": "Filter Parameter: <br>Sets maximum number records to return from the API request. <br/>If filter [page-size] not sent and [page-all] not sent then default page-size is 500. <br/><br/>e.g. page-size=50",
+            "style": "simple",
+            "schema": {
+              "type": "integer",
+              "example": 5
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Filter Parameter: <br>Skips a set of results based on page size and returns the next set of results from the API request. <br/>Skip [page-size] * [page] and returns [page-size] of results. <br/>If filter [page-size] not sent and [page-all] not sent then default page-size is 500. <br/><br/>e.g. page=5",
+            "style": "simple"
+          },
+          {
+            "name": "page-all",
+            "in": "query",
+            "description": "Filter Parameter: <br>Ignores paging parameters and returns all data from a result set. <br/>This does not discard other filters such as region and map bounds. <br/>Valid values are <br/>true, yes, y, 1 <br/><br/>e.g. page-all=true",
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/IncidentApiResult"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IncidentApiResult"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IncidentApiResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/weather-sensor-sites": {
+      "get": {
+        "tags": [
+          "Weather Sensor Sites"
+        ],
+        "summary": "Get all weather sensor sites",
+        "description": "Data can be filtered using optional query parameters.\r\n\r\nSee the paramters section.\r\n\r\n<a href=\"/docs/v1/weather-sensor-sites\">Weather Sensor Sites</a> Documentation",
+        "parameters": [
+          {
+            "name": "map-bounds-sw",
+            "in": "query",
+            "description": "Filter Parameter: <br/>South west map bounds as two double values separated by comma (longitude,latitude) <br/>Requires filter [map-bounds-ne] to complete the bounding box. <br/><br/>e.g. map-bounds-sw=41.01106167071922,-82.36851259765625",
+            "style": "simple"
+          },
+          {
+            "name": "map-bounds-ne",
+            "in": "query",
+            "description": "Filter Parameter: <br/>North east map bounds as two double values separated by comma (longitude,latitude) <br/>Requires filter [map-bounds-sw] to complete the bounding box. <br/><br/>e.g. map-bounds-ne=41.01106167071922,-82.36851259765625",
+            "style": "simple"
+          },
+          {
+            "name": "region",
+            "in": "query",
+            "description": "Filter Parameter: <br/>Name of the region you want to pull results for <br/>Can send multiple regions comma separated <br/><br/>Valid values are <br/>akron, central-ohio, cincinnati, cleveland, columbus, dayton, ne-ohio, nw-ohio, se-ohio, sw-ohio, toledo <br/><br/>e.g. region=ne-ohio <br/>e.g. region=cleveland,akron",
+            "style": "simple"
+          },
+          {
+            "name": "radius",
+            "in": "query",
+            "description": "Filter Parameter: <br/>Returns results within the radius of a lat long point. <br/>Values are latitude,longitude,miles from center point. <br/><br/>e.g. radius=41.01106167071922,-82.36851259765625,3",
+            "style": "simple"
+          },
+          {
+            "name": "page-size",
+            "in": "query",
+            "description": "Filter Parameter: <br>Sets maximum number records to return from the API request. <br/>If filter [page-size] not sent and [page-all] not sent then default page-size is 500. <br/><br/>e.g. page-size=50",
+            "style": "simple",
+            "schema": {
+              "type": "integer",
+              "example": 5
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Filter Parameter: <br>Skips a set of results based on page size and returns the next set of results from the API request. <br/>Skip [page-size] * [page] and returns [page-size] of results. <br/>If filter [page-size] not sent and [page-all] not sent then default page-size is 500. <br/><br/>e.g. page=5",
+            "style": "simple"
+          },
+          {
+            "name": "page-all",
+            "in": "query",
+            "description": "Filter Parameter: <br>Ignores paging parameters and returns all data from a result set. <br/>This does not discard other filters such as region and map bounds. <br/>Valid values are <br/>true, yes, y, 1 <br/><br/>e.g. page-all=true",
+            "style": "simple"
+          },
+          {
+            "name": "hazards-only",
+            "in": "query",
+            "description": "Filter Parameter: <br/>Filters out weather sensor sites with hazardous conditions <br/><br/>Hazardous conditions include <br/>rain, snow, ice, high wind, and low visibility <br/><br/>Valid values are <br/>true, yes, y, 1 <br/><br/>e.g. hazards-only=true",
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/WeatherSensorSiteApiResult"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WeatherSensorSiteApiResult"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WeatherSensorSiteApiResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/weather-sensor-sites/{id}": {
+      "get": {
+        "tags": [
+          "Weather Sensor Sites"
+        ],
+        "summary": "Get weather sensor sites by unique id.",
+        "description": "Request will return matching weather sensor site data or a 404 (Not Found Error).\r\n\r\nYou can send multiple ids comma separated.\r\n\r\n<a href=\"/docs/v1/weather-sensor-sites\">Weather Sensor Sites</a> Documentation",
+        "operationId": "weather-sensor-sites",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Unique identifier for the weather sensor site",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "map-bounds-sw",
+            "in": "query",
+            "description": "Filter Parameter: <br/>South west map bounds as two double values separated by comma (longitude,latitude) <br/>Requires filter [map-bounds-ne] to complete the bounding box. <br/><br/>e.g. map-bounds-sw=41.01106167071922,-82.36851259765625",
+            "style": "simple"
+          },
+          {
+            "name": "map-bounds-ne",
+            "in": "query",
+            "description": "Filter Parameter: <br/>North east map bounds as two double values separated by comma (longitude,latitude) <br/>Requires filter [map-bounds-sw] to complete the bounding box. <br/><br/>e.g. map-bounds-ne=41.01106167071922,-82.36851259765625",
+            "style": "simple"
+          },
+          {
+            "name": "region",
+            "in": "query",
+            "description": "Filter Parameter: <br/>Name of the region you want to pull results for <br/>Can send multiple regions comma separated <br/><br/>Valid values are <br/>akron, central-ohio, cincinnati, cleveland, columbus, dayton, ne-ohio, nw-ohio, se-ohio, sw-ohio, toledo <br/><br/>e.g. region=ne-ohio <br/>e.g. region=cleveland,akron",
+            "style": "simple"
+          },
+          {
+            "name": "radius",
+            "in": "query",
+            "description": "Filter Parameter: <br/>Returns results within the radius of a lat long point. <br/>Values are latitude,longitude,miles from center point. <br/><br/>e.g. radius=41.01106167071922,-82.36851259765625,3",
+            "style": "simple"
+          },
+          {
+            "name": "page-size",
+            "in": "query",
+            "description": "Filter Parameter: <br>Sets maximum number records to return from the API request. <br/>If filter [page-size] not sent and [page-all] not sent then default page-size is 500. <br/><br/>e.g. page-size=50",
+            "style": "simple",
+            "schema": {
+              "type": "integer",
+              "example": 5
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Filter Parameter: <br>Skips a set of results based on page size and returns the next set of results from the API request. <br/>Skip [page-size] * [page] and returns [page-size] of results. <br/>If filter [page-size] not sent and [page-all] not sent then default page-size is 500. <br/><br/>e.g. page=5",
+            "style": "simple"
+          },
+          {
+            "name": "page-all",
+            "in": "query",
+            "description": "Filter Parameter: <br>Ignores paging parameters and returns all data from a result set. <br/>This does not discard other filters such as region and map bounds. <br/>Valid values are <br/>true, yes, y, 1 <br/><br/>e.g. page-all=true",
+            "style": "simple"
+          },
+          {
+            "name": "hazards-only",
+            "in": "query",
+            "description": "Filter Parameter: <br/>Filters out weather sensor sites with hazardous conditions <br/><br/>Hazardous conditions include <br/>rain, snow, ice, high wind, and low visibility <br/><br/>Valid values are <br/>true, yes, y, 1 <br/><br/>e.g. hazards-only=true",
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/WeatherSensorSiteApiResult"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WeatherSensorSiteApiResult"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WeatherSensorSiteApiResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/work-zones/wzdx/4.2": {
+      "get": {
+        "tags": [
+          "Work Zones"
+        ],
+        "summary": "Work zone information in WZDX 4.2 format",
+        "description": "Request button is disabled in swagger.\r\nResponse returns too much information for the swagger page.",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/WZDX_4_2"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WZDX_4_2"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WZDX_4_2"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AtmosphericSensor": {
+        "required": [
+          "airTemperature",
+          "averageWindSpeed",
+          "dewpointTemperature",
+          "humidity",
+          "lastUpdate",
+          "maximumWindSpeed",
+          "precipitation",
+          "precipitationAccumulation",
+          "precipitationintensity",
+          "precipitationRate",
+          "pressure",
+          "visibility",
+          "windDirection"
+        ],
+        "type": "object",
+        "properties": {
+          "airTemperature": {
+            "type": "number",
+            "description": "Air temperature in fahrenheit",
+            "format": "double"
+          },
+          "dewpointTemperature": {
+            "type": "number",
+            "description": "Dewpoint temperature in fahrenheit",
+            "format": "double"
+          },
+          "humidity": {
+            "type": "number",
+            "description": "Relative humidity percentage",
+            "format": "double"
+          },
+          "averageWindSpeed": {
+            "type": "number",
+            "description": "Average wind speed in miles per hour",
+            "format": "double"
+          },
+          "maximumWindSpeed": {
+            "type": "number",
+            "description": "Maximum wind speed in miles per hour",
+            "format": "double"
+          },
+          "windDirection": {
+            "minLength": 1,
+            "type": "string",
+            "description": "Wind direction or wind avg direction"
+          },
+          "pressure": {
+            "type": "number",
+            "description": "Wind pressure",
+            "format": "double"
+          },
+          "precipitation": {
+            "minLength": 1,
+            "type": "string",
+            "description": "Precipitation type if any"
+          },
+          "precipitationRate": {
+            "type": "number",
+            "description": "Precipitation rate",
+            "format": "double"
+          },
+          "precipitationAccumulation": {
+            "type": "number",
+            "description": "Precipitation accumulation",
+            "format": "double"
+          },
+          "precipitationintensity": {
+            "minLength": 1,
+            "type": "string",
+            "description": "Precipitation intensity"
+          },
+          "visibility": {
+            "type": "number",
+            "description": "Senor visibility in miles",
+            "format": "double"
+          },
+          "lastUpdate": {
+            "type": "string",
+            "description": "Last senor updated date",
+            "format": "date-time"
+          }
+        },
+        "additionalProperties": false,
+        "description": "Atmospheric represents data from an ODOT monitored weather atmospheric sensor"
+      },
+      "Camera": {
+        "required": [
+          "cameraViews",
+          "description",
+          "id",
+          "latitude",
+          "links",
+          "location",
+          "longitude"
+        ],
+        "type": "object",
+        "properties": {
+          "links": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Link"
+            },
+            "description": "Links related to the current item"
+          },
+          "id": {
+            "minLength": 1,
+            "type": "string",
+            "description": "Unique Identifier"
+          },
+          "latitude": {
+            "type": "number",
+            "description": "The angular distance of a place north or south of the earth's equator",
+            "format": "double"
+          },
+          "longitude": {
+            "type": "number",
+            "description": "The angular distance of a place east or west of the meridian at Greenwich, England",
+            "format": "double"
+          },
+          "location": {
+            "minLength": 1,
+            "type": "string",
+            "description": "Camera road or intersection"
+          },
+          "description": {
+            "minLength": 1,
+            "type": "string",
+            "description": "Camera location and type information"
+          },
+          "cameraViews": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CameraView"
+            },
+            "description": "List of camera views (There can be one or more cameras a site)"
+          }
+        },
+        "additionalProperties": false,
+        "description": "Camera model represents an ODOT monitored camera site where one or more camera devices may exist"
+      },
+      "CameraApiResult": {
+        "required": [
+          "currentResultCount",
+          "lastUpdated",
+          "links",
+          "results",
+          "totalPageCount",
+          "totalResultCount"
+        ],
+        "type": "object",
+        "properties": {
+          "links": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Link"
+            },
+            "description": "Links related to the current API request"
+          },
+          "lastUpdated": {
+            "type": "string",
+            "description": "Date the data was last retrieved",
+            "format": "date-time"
+          },
+          "accecptedFilters": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/QueryParam"
+            },
+            "description": "Filters that were validated and applied",
+            "nullable": true
+          },
+          "rejectedFilters": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/QueryParam"
+            },
+            "description": "Filters that failed validation and were not applied",
+            "nullable": true
+          },
+          "totalPageCount": {
+            "type": "integer",
+            "description": "Total number of pages of data available. (Based on current page size)",
+            "format": "int32"
+          },
+          "totalResultCount": {
+            "type": "integer",
+            "description": "Total result count of the API request",
+            "format": "int32"
+          },
+          "currentResultCount": {
+            "type": "integer",
+            "description": "Number of results returned from the API (May vary from total results if pagination occurred)",
+            "format": "int32"
+          },
+          "results": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Camera"
+            },
+            "description": "List of the requested API data (cameras, construction, etc)"
+          }
+        },
+        "additionalProperties": false,
+        "description": "Result model for successful API request"
+      },
+      "CameraView": {
+        "required": [
+          "direction",
+          "largeUrl",
+          "mainRoute",
+          "smallUrl"
+        ],
+        "type": "object",
+        "properties": {
+          "direction": {
+            "minLength": 1,
+            "type": "string",
+            "description": "Direction the camera is facing.\r\nPTZ stands for Pan, Tilt, and Zoom meaning the camera has no fixed position."
+          },
+          "smallUrl": {
+            "minLength": 1,
+            "type": "string",
+            "description": "URL link to the camera images.\r\nImage snapshots are updated every 5 seconds."
+          },
+          "largeUrl": {
+            "minLength": 1,
+            "type": "string",
+            "description": "URL link to the larger camera images.\r\nImage snapshots are updated every 5 seconds."
+          },
+          "mainRoute": {
+            "minLength": 1,
+            "type": "string",
+            "description": "The main road/intersection this camera is intended to watch"
+          }
+        },
+        "additionalProperties": false,
+        "description": "CameraView model represents a physical camera"
+      },
+      "Construction": {
+        "required": [
+          "category",
+          "description",
+          "direction",
+          "district",
+          "endDate",
+          "id",
+          "latitude",
+          "links",
+          "location",
+          "longitude",
+          "routeName",
+          "startDate",
+          "status"
+        ],
+        "type": "object",
+        "properties": {
+          "links": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Link"
+            },
+            "description": "Links related to the current item"
+          },
+          "id": {
+            "minLength": 1,
+            "type": "string",
+            "description": "Unique Identifier"
+          },
+          "latitude": {
+            "type": "number",
+            "description": "The angular distance of a place north or south of the earth's equator",
+            "format": "double"
+          },
+          "longitude": {
+            "type": "number",
+            "description": "The angular distance of a place east or west of the meridian at Greenwich, England",
+            "format": "double"
+          },
+          "location": {
+            "minLength": 1,
+            "type": "string",
+            "description": "Construction road or intersection"
+          },
+          "description": {
+            "minLength": 1,
+            "type": "string",
+            "description": "Construction description message"
+          },
+          "category": {
+            "minLength": 1,
+            "type": "string",
+            "description": "Indicates planned or unplanned construction"
+          },
+          "direction": {
+            "minLength": 1,
+            "type": "string",
+            "description": "Side or sides of the road where construction exists"
+          },
+          "district": {
+            "minLength": 1,
+            "type": "string",
+            "description": "District where construction is located"
+          },
+          "routeName": {
+            "minLength": 1,
+            "type": "string",
+            "description": "Road name where construction is located"
+          },
+          "status": {
+            "minLength": 1,
+            "type": "string",
+            "description": "Indicates if road is open, restricted, or closed for construction"
+          },
+          "startDate": {
+            "type": "string",
+            "description": "Expected construction start date",
+            "format": "date-time"
+          },
+          "endDate": {
+            "type": "string",
+            "description": "Expected construction end date",
+            "format": "date-time"
+          },
+          "workZoneProjectId": {
+            "type": "string",
+            "description": "Work zone project id",
+            "nullable": true
+          },
+          "workZones": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ConstructionWorkZone"
+            },
+            "description": "Work zone information",
+            "nullable": true
+          },
+          "detours": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ConstructionDetour"
+            },
+            "description": "Work zone detour information",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "Construction represents a location marker for construction site"
+      },
+      "ConstructionApiResult": {
+        "required": [
+          "currentResultCount",
+          "lastUpdated",
+          "links",
+          "results",
+          "totalPageCount",
+          "totalResultCount"
+        ],
+        "type": "object",
+        "properties": {
+          "links": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Link"
+            },
+            "description": "Links related to the current API request"
+          },
+          "lastUpdated": {
+            "type": "string",
+            "description": "Date the data was last retrieved",
+            "format": "date-time"
+          },
+          "accecptedFilters": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/QueryParam"
+            },
+            "description": "Filters that were validated and applied",
+            "nullable": true
+          },
+          "rejectedFilters": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/QueryParam"
+            },
+            "description": "Filters that failed validation and were not applied",
+            "nullable": true
+          },
+          "totalPageCount": {
+            "type": "integer",
+            "description": "Total number of pages of data available. (Based on current page size)",
+            "format": "int32"
+          },
+          "totalResultCount": {
+            "type": "integer",
+            "description": "Total result count of the API request",
+            "format": "int32"
+          },
+          "currentResultCount": {
+            "type": "integer",
+            "description": "Number of results returned from the API (May vary from total results if pagination occurred)",
+            "format": "int32"
+          },
+          "results": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Construction"
+            },
+            "description": "List of the requested API data (cameras, construction, etc)"
+          }
+        },
+        "additionalProperties": false,
+        "description": "Result model for successful API request"
+      },
+      "ConstructionDetour": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Detour name",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "description": "Detoru Description",
+            "nullable": true
+          },
+          "startDate": {
+            "type": "string",
+            "description": "Detour start date",
+            "nullable": true
+          },
+          "endDate": {
+            "type": "string",
+            "description": "Detour end date",
+            "nullable": true
+          },
+          "detourRoutes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ConstructionDetourRoute"
+            },
+            "description": "Collection of detour roads that make up the full detour route",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "Work zone detour information"
+      },
+      "ConstructionDetourData": {
+        "type": "object",
+        "properties": {
+          "workZoneProjectId": {
+            "type": "string",
+            "description": "Work zone project id",
+            "nullable": true
+          },
+          "workZones": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ConstructionWorkZone"
+            },
+            "description": "Work zone information",
+            "nullable": true
+          },
+          "detours": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ConstructionDetour"
+            },
+            "description": "Work zone detour information",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "Construction represents a location marker for construction site"
+      },
+      "ConstructionDetourDataApiResult": {
+        "required": [
+          "currentResultCount",
+          "lastUpdated",
+          "links",
+          "results",
+          "totalPageCount",
+          "totalResultCount"
+        ],
+        "type": "object",
+        "properties": {
+          "links": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Link"
+            },
+            "description": "Links related to the current API request"
+          },
+          "lastUpdated": {
+            "type": "string",
+            "description": "Date the data was last retrieved",
+            "format": "date-time"
+          },
+          "accecptedFilters": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/QueryParam"
+            },
+            "description": "Filters that were validated and applied",
+            "nullable": true
+          },
+          "rejectedFilters": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/QueryParam"
+            },
+            "description": "Filters that failed validation and were not applied",
+            "nullable": true
+          },
+          "totalPageCount": {
+            "type": "integer",
+            "description": "Total number of pages of data available. (Based on current page size)",
+            "format": "int32"
+          },
+          "totalResultCount": {
+            "type": "integer",
+            "description": "Total result count of the API request",
+            "format": "int32"
+          },
+          "currentResultCount": {
+            "type": "integer",
+            "description": "Number of results returned from the API (May vary from total results if pagination occurred)",
+            "format": "int32"
+          },
+          "results": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ConstructionDetourData"
+            },
+            "description": "List of the requested API data (cameras, construction, etc)"
+          }
+        },
+        "additionalProperties": false,
+        "description": "Result model for successful API request"
+      },
+      "ConstructionDetourRoute": {
+        "type": "object",
+        "properties": {
+          "roadName": {
+            "type": "string",
+            "description": "Detour road name",
+            "nullable": true
+          },
+          "startLocation": {
+            "type": "array",
+            "items": {
+              "type": "number",
+              "format": "double"
+            },
+            "description": "Start longitude and latitude point",
+            "nullable": true
+          },
+          "endLocation": {
+            "type": "array",
+            "items": {
+              "type": "number",
+              "format": "double"
+            },
+            "description": "End longitude and latitude point",
+            "nullable": true
+          },
+          "polyline": {
+            "type": "array",
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "number",
+                "format": "double"
+              }
+            },
+            "description": "Collection of longitude and latitude points that make up the detour route",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "Detour road and polyline that is part of full detour route"
+      },
+      "ConstructionWorkZone": {
+        "type": "object",
+        "properties": {
+          "startLocation": {
+            "type": "array",
+            "items": {
+              "type": "number",
+              "format": "double"
+            },
+            "description": "Start longitude and latitude point",
+            "nullable": true
+          },
+          "endLocation": {
+            "type": "array",
+            "items": {
+              "type": "number",
+              "format": "double"
+            },
+            "description": "End longitude and latitude point",
+            "nullable": true
+          },
+          "polyline": {
+            "type": "array",
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "number",
+                "format": "double"
+              }
+            },
+            "description": "Collection of longitude and latitude points that make up the work zone",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "Work zone information"
+      },
+      "CoreDetails_4_2": {
+        "required": [
+          "dataSourceId",
+          "description",
+          "direction",
+          "eventType",
+          "name",
+          "roadNames",
+          "updateDate"
+        ],
+        "type": "object",
+        "properties": {
+          "dataSourceId": {
+            "minLength": 1,
+            "type": "string",
+            "description": "Identifies the data source from which the road event data is sourced from"
+          },
+          "description": {
+            "minLength": 1,
+            "type": "string",
+            "description": "Short free text description of the road event"
+          },
+          "direction": {
+            "minLength": 1,
+            "type": "string",
+            "description": "The direction of a road based on standard naming for US roads; indicates the direction the traffic flow not the real heading angle."
+          },
+          "eventType": {
+            "minLength": 1,
+            "type": "string",
+            "description": "Road Event Type Enumerated Type"
+          },
+          "name": {
+            "minLength": 1,
+            "type": "string",
+            "description": "A human-readable name for the road event"
+          },
+          "roadNames": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "A list of publicly known names of the road on which the event occurs. This may include the road number designated by a jurisdiction such as a county, state or interstate (e.g. I-5, VT 133)"
+          },
+          "updateDate": {
+            "minLength": 1,
+            "type": "string",
+            "description": "The UTC date and time (formatted according to RFC 3339, Section 5.6) when any information in the RoadEventFeature (including child objects) that the RoadEventCoreDetails applies to was most recently updated or confirmed as up to date"
+          }
+        },
+        "additionalProperties": false,
+        "description": "The core details of an event occurring on a roadway (i.e. a road event) that is shared by all types of road events"
+      },
+      "DangerousSlowdown": {
+        "required": [
+          "currentMPH",
+          "description",
+          "direction",
+          "id",
+          "latitude",
+          "links",
+          "location",
+          "longitude",
+          "normalMPH",
+          "routeName"
+        ],
+        "type": "object",
+        "properties": {
+          "links": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Link"
+            },
+            "description": "Links related to the current item"
+          },
+          "id": {
+            "minLength": 1,
+            "type": "string",
+            "description": "Unique Identifier"
+          },
+          "latitude": {
+            "type": "number",
+            "description": "The angular distance of a place north or south of the earth's equator",
+            "format": "double"
+          },
+          "longitude": {
+            "type": "number",
+            "description": "The angular distance of a place east or west of the meridian at Greenwich, England",
+            "format": "double"
+          },
+          "location": {
+            "minLength": 1,
+            "type": "string",
+            "description": "Address or location"
+          },
+          "description": {
+            "minLength": 1,
+            "type": "string",
+            "description": "Description message"
+          },
+          "normalMPH": {
+            "type": "integer",
+            "description": "Normal MPH at the dangerous slowdown",
+            "format": "int32"
+          },
+          "currentMPH": {
+            "type": "integer",
+            "description": "Current MPH at the dangerous slowdown",
+            "format": "int32"
+          },
+          "routeName": {
+            "minLength": 1,
+            "type": "string",
+            "description": "Road name where the dangerous slowdown is located"
+          },
+          "direction": {
+            "minLength": 1,
+            "type": "string",
+            "description": "Direction where the dangerous slowdown is impacting"
+          }
+        },
+        "additionalProperties": false,
+        "description": "Travel Delay represents information about a traffic slowdown on ODOT monitored roads"
+      },
+      "DangerousSlowdownApiResult": {
+        "required": [
+          "currentResultCount",
+          "lastUpdated",
+          "links",
+          "results",
+          "totalPageCount",
+          "totalResultCount"
+        ],
+        "type": "object",
+        "properties": {
+          "links": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Link"
+            },
+            "description": "Links related to the current API request"
+          },
+          "lastUpdated": {
+            "type": "string",
+            "description": "Date the data was last retrieved",
+            "format": "date-time"
+          },
+          "accecptedFilters": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/QueryParam"
+            },
+            "description": "Filters that were validated and applied",
+            "nullable": true
+          },
+          "rejectedFilters": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/QueryParam"
+            },
+            "description": "Filters that failed validation and were not applied",
+            "nullable": true
+          },
+          "totalPageCount": {
+            "type": "integer",
+            "description": "Total number of pages of data available. (Based on current page size)",
+            "format": "int32"
+          },
+          "totalResultCount": {
+            "type": "integer",
+            "description": "Total result count of the API request",
+            "format": "int32"
+          },
+          "currentResultCount": {
+            "type": "integer",
+            "description": "Number of results returned from the API (May vary from total results if pagination occurred)",
+            "format": "int32"
+          },
+          "results": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DangerousSlowdown"
+            },
+            "description": "List of the requested API data (cameras, construction, etc)"
+          }
+        },
+        "additionalProperties": false,
+        "description": "Result model for successful API request"
+      },
+      "DataSource": {
+        "type": "object",
+        "properties": {
+          "dataSourceId": {
+            "type": "string",
+            "nullable": true
+          },
+          "organizationName": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "DigitalSign": {
+        "required": [
+          "description",
+          "id",
+          "imageUrls",
+          "latitude",
+          "links",
+          "location",
+          "longitude",
+          "messages",
+          "signTypeName"
+        ],
+        "type": "object",
+        "properties": {
+          "links": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Link"
+            },
+            "description": "Links related to the current item"
+          },
+          "id": {
+            "minLength": 1,
+            "type": "string",
+            "description": "Unique Identifier"
+          },
+          "latitude": {
+            "type": "number",
+            "description": "The angular distance of a place north or south of the earth's equator",
+            "format": "double"
+          },
+          "longitude": {
+            "type": "number",
+            "description": "The angular distance of a place east or west of the meridian at Greenwich, England",
+            "format": "double"
+          },
+          "location": {
+            "minLength": 1,
+            "type": "string",
+            "description": "Digital sign road or intersection"
+          },
+          "description": {
+            "minLength": 1,
+            "type": "string",
+            "description": "Digital sign type description"
+          },
+          "signTypeName": {
+            "minLength": 1,
+            "type": "string",
+            "description": "Digital sign type."
+          },
+          "messages": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Sign message displayed. Some signs have multiple messages that change on a timer."
+          },
+          "imageUrls": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Sign images displayed. Some signs have an jpeg representation of the sign."
+          }
+        },
+        "additionalProperties": false,
+        "description": "Digital Sign represents an ODOT monitored digital sign and its messages"
+      },
+      "DigitalSignApiResult": {
+        "required": [
+          "currentResultCount",
+          "lastUpdated",
+          "links",
+          "results",
+          "totalPageCount",
+          "totalResultCount"
+        ],
+        "type": "object",
+        "properties": {
+          "links": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Link"
+            },
+            "description": "Links related to the current API request"
+          },
+          "lastUpdated": {
+            "type": "string",
+            "description": "Date the data was last retrieved",
+            "format": "date-time"
+          },
+          "accecptedFilters": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/QueryParam"
+            },
+            "description": "Filters that were validated and applied",
+            "nullable": true
+          },
+          "rejectedFilters": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/QueryParam"
+            },
+            "description": "Filters that failed validation and were not applied",
+            "nullable": true
+          },
+          "totalPageCount": {
+            "type": "integer",
+            "description": "Total number of pages of data available. (Based on current page size)",
+            "format": "int32"
+          },
+          "totalResultCount": {
+            "type": "integer",
+            "description": "Total result count of the API request",
+            "format": "int32"
+          },
+          "currentResultCount": {
+            "type": "integer",
+            "description": "Number of results returned from the API (May vary from total results if pagination occurred)",
+            "format": "int32"
+          },
+          "results": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DigitalSign"
+            },
+            "description": "List of the requested API data (cameras, construction, etc)"
+          }
+        },
+        "additionalProperties": false,
+        "description": "Result model for successful API request"
+      },
+      "ErrorResult": {
+        "required": [
+          "errorDescription",
+          "links"
+        ],
+        "type": "object",
+        "properties": {
+          "links": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Link"
+            },
+            "description": "Links related to the Error Result"
+          },
+          "errorDescription": {
+            "minLength": 1,
+            "type": "string",
+            "description": "Detailed error description"
+          }
+        },
+        "additionalProperties": false,
+        "description": "Result model for failed API request"
+      },
+      "FeedInfo": {
+        "type": "object",
+        "properties": {
+          "contactName": {
+            "type": "string",
+            "description": "The name of the individual or group responsible for the data feed",
+            "nullable": true
+          },
+          "contactEmail": {
+            "type": "string",
+            "description": "The email address of the individual or group responsible for the data feed",
+            "nullable": true
+          },
+          "dataSources": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DataSource"
+            },
+            "description": "A list of specific data sources for the road event data in the feed",
+            "nullable": true
+          },
+          "license": {
+            "type": "string",
+            "description": "The URL of the license that applies to the data in the WZDx feed. This *must* be the string \\\"https://creativecommons.org/publicdomain/zero/1.0/\\\"",
+            "nullable": true
+          },
+          "publisher": {
+            "type": "string",
+            "description": "The organization responsible for publishing the feed",
+            "nullable": true
+          },
+          "updateFrequency": {
+            "type": "integer",
+            "description": "The frequency in seconds at which the data feed is updated",
+            "format": "int32"
+          },
+          "version": {
+            "type": "string",
+            "description": "The WZDx specification version used to create the data feed, in 'major.minor' format",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "Describes WZDx feed header information such as metadata, contact information, and data sources"
+      },
+      "Geometry": {
+        "required": [
+          "coordinates",
+          "type"
+        ],
+        "type": "object",
+        "properties": {
+          "type": {
+            "minLength": 1,
+            "type": "string",
+            "description": "LineString or Multipoint type"
+          },
+          "coordinates": {
+            "type": "array",
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "number",
+                "format": "double"
+              }
+            },
+            "description": "Longitude and Latitude map points"
+          }
+        },
+        "additionalProperties": false,
+        "description": "GeoJSON LineString or GeoJSON MultiPoint"
+      },
+      "Incident": {
+        "required": [
+          "category",
+          "description",
+          "direction",
+          "id",
+          "latitude",
+          "links",
+          "location",
+          "longitude",
+          "roadStatus",
+          "routeName"
+        ],
+        "type": "object",
+        "properties": {
+          "links": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Link"
+            },
+            "description": "Links related to the current item"
+          },
+          "id": {
+            "minLength": 1,
+            "type": "string",
+            "description": "Unique Identifier"
+          },
+          "latitude": {
+            "type": "number",
+            "description": "The angular distance of a place north or south of the earth's equator",
+            "format": "double"
+          },
+          "longitude": {
+            "type": "number",
+            "description": "The angular distance of a place east or west of the meridian at Greenwich, England",
+            "format": "double"
+          },
+          "location": {
+            "minLength": 1,
+            "type": "string",
+            "description": "Incident road or intersection"
+          },
+          "description": {
+            "minLength": 1,
+            "type": "string",
+            "description": "Incident description message"
+          },
+          "category": {
+            "minLength": 1,
+            "type": "string",
+            "description": "Incident type"
+          },
+          "direction": {
+            "minLength": 1,
+            "type": "string",
+            "description": "Direction on the road where the incident exists"
+          },
+          "routeName": {
+            "minLength": 1,
+            "type": "string",
+            "description": "Name of the road where the incident is located"
+          },
+          "roadStatus": {
+            "minLength": 1,
+            "type": "string",
+            "description": "Indicates if the open, closed, or partially closed"
+          },
+          "roadClosureDetails": {
+            "$ref": "#/components/schemas/RoadClosureDetails"
+          }
+        },
+        "additionalProperties": false,
+        "description": "Incident represents a location marker for an accident, road closure, or another important event"
+      },
+      "IncidentApiResult": {
+        "required": [
+          "currentResultCount",
+          "lastUpdated",
+          "links",
+          "results",
+          "totalPageCount",
+          "totalResultCount"
+        ],
+        "type": "object",
+        "properties": {
+          "links": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Link"
+            },
+            "description": "Links related to the current API request"
+          },
+          "lastUpdated": {
+            "type": "string",
+            "description": "Date the data was last retrieved",
+            "format": "date-time"
+          },
+          "accecptedFilters": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/QueryParam"
+            },
+            "description": "Filters that were validated and applied",
+            "nullable": true
+          },
+          "rejectedFilters": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/QueryParam"
+            },
+            "description": "Filters that failed validation and were not applied",
+            "nullable": true
+          },
+          "totalPageCount": {
+            "type": "integer",
+            "description": "Total number of pages of data available. (Based on current page size)",
+            "format": "int32"
+          },
+          "totalResultCount": {
+            "type": "integer",
+            "description": "Total result count of the API request",
+            "format": "int32"
+          },
+          "currentResultCount": {
+            "type": "integer",
+            "description": "Number of results returned from the API (May vary from total results if pagination occurred)",
+            "format": "int32"
+          },
+          "results": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Incident"
+            },
+            "description": "List of the requested API data (cameras, construction, etc)"
+          }
+        },
+        "additionalProperties": false,
+        "description": "Result model for successful API request"
+      },
+      "Link": {
+        "required": [
+          "href",
+          "rel"
+        ],
+        "type": "object",
+        "properties": {
+          "href": {
+            "minLength": 1,
+            "type": "string",
+            "description": "Url to a page or endpoint"
+          },
+          "rel": {
+            "minLength": 1,
+            "type": "string",
+            "description": "Identifier for the href url.\r\n[self] = link to the current item,\r\n[documentation] = link to related documentation,\r\n[redirect] = link to redirect page"
+          },
+          "method": {
+            "type": "string",
+            "description": "Method type of the link.\r\nIf not displayed then GET is assumed.",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "Links capture data related to the current model they live on.\r\nThe type of link is dependent on the rel property."
+      },
+      "Properties_4_2": {
+        "required": [
+          "beginningAccuracy",
+          "coreDetails",
+          "endDate",
+          "endingAccuracy",
+          "isEndDateVerified",
+          "isEndPositionVerified",
+          "isStartDateVerified",
+          "isStartPositionVerified",
+          "locationMethod",
+          "startDate",
+          "vehicleImpact"
+        ],
+        "type": "object",
+        "properties": {
+          "coreDetails": {
+            "$ref": "#/components/schemas/CoreDetails_4_2"
+          },
+          "startDate": {
+            "minLength": 1,
+            "type": "string",
+            "description": "The UTC date and time (formatted according to RFC 3339, Section 5.6) when the road event begins (e.g. 2020-11-03T19:37:00Z)"
+          },
+          "endDate": {
+            "minLength": 1,
+            "type": "string",
+            "description": "The UTC date and time (formatted according to RFC 3339, Section 5.6) when the road event ends (e.g. 2020-11-03T19:37:00Z)"
+          },
+          "locationMethod": {
+            "minLength": 1,
+            "type": "string",
+            "description": "The typical method used to locate the beginning and end of a work zone impact area"
+          },
+          "vehicleImpact": {
+            "minLength": 1,
+            "type": "string",
+            "description": "The impact to vehicular lanes along a single road in a single direction"
+          },
+          "isStartDateVerified": {
+            "type": "boolean",
+            "description": "Indicates if work has been confirmed to have started, such as from a person or field device"
+          },
+          "isEndDateVerified": {
+            "type": "boolean",
+            "description": "Indicates if work has been confirmed to have ended, such as from a person or field device"
+          },
+          "isStartPositionVerified": {
+            "type": "boolean",
+            "description": "Indicates if the start position (first geometric coordinate pair) is based on actual reported data from a GPS-equipped device that measured the location of the start of the work zone."
+          },
+          "isEndPositionVerified": {
+            "type": "boolean",
+            "description": "Indicates if the end position (last geometric coordinate pair) is based on actual reported data from a GPS-equipped device that measured the location of the end of the work zone."
+          },
+          "beginningAccuracy": {
+            "minLength": 1,
+            "type": "string",
+            "description": "An indication of how a geographical coordinate was defined"
+          },
+          "endingAccuracy": {
+            "minLength": 1,
+            "type": "string",
+            "description": "An indication of how a geographical coordinate was defined"
+          }
+        },
+        "additionalProperties": false,
+        "description": "Road Event Properties"
+      },
+      "QueryParam": {
+        "required": [
+          "key",
+          "value"
+        ],
+        "type": "object",
+        "properties": {
+          "key": {
+            "minLength": 1,
+            "type": "string",
+            "description": "Key for the query parameter"
+          },
+          "value": {
+            "minLength": 1,
+            "type": "string",
+            "description": "Value for the query parameter"
+          },
+          "error": {
+            "type": "string",
+            "description": "Error for the query parameter",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "Query strings appended to the request url."
+      },
+      "RoadClosureDetails": {
+        "type": "object",
+        "properties": {
+          "closureStartLocation": {
+            "type": "array",
+            "items": {
+              "type": "number",
+              "format": "double"
+            },
+            "description": "Road closed start longitude and latitude point",
+            "nullable": true
+          },
+          "closureEndLocation": {
+            "type": "array",
+            "items": {
+              "type": "number",
+              "format": "double"
+            },
+            "description": "Road closed end longitude and latitude point / incident location",
+            "nullable": true
+          },
+          "polyline": {
+            "type": "array",
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "number",
+                "format": "double"
+              }
+            },
+            "description": "Collection of longitude and latitude points that make up the incident closure",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "Road closure details"
+      },
+      "RoadEventFeature_4_2": {
+        "required": [
+          "geometry",
+          "id",
+          "properties",
+          "type"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "minLength": 1,
+            "type": "string",
+            "description": "Road Event Feature unique id"
+          },
+          "properties": {
+            "$ref": "#/components/schemas/Properties_4_2"
+          },
+          "geometry": {
+            "$ref": "#/components/schemas/Geometry"
+          },
+          "type": {
+            "minLength": 1,
+            "type": "string",
+            "description": "The GeoJSON object type; must be 'Feature'"
+          }
+        },
+        "additionalProperties": false,
+        "description": "Road Event Feature"
+      },
+      "SurfaceSensor": {
+        "required": [
+          "lastUpdate",
+          "name",
+          "status",
+          "subSurfaceTemperature",
+          "surfaceTemperature"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "minLength": 1,
+            "type": "string",
+            "description": "Name for the sensor"
+          },
+          "status": {
+            "minLength": 1,
+            "type": "string",
+            "description": "Status of the sensor"
+          },
+          "surfaceTemperature": {
+            "type": "number",
+            "description": "Surface temperature in fahrenheit",
+            "format": "double"
+          },
+          "subSurfaceTemperature": {
+            "type": "number",
+            "description": "Sub-surface temperature in fahrenheit",
+            "format": "double"
+          },
+          "lastUpdate": {
+            "type": "string",
+            "description": "Last senor updated date",
+            "format": "date-time"
+          }
+        },
+        "additionalProperties": false,
+        "description": "Surface Sensor represents data from an ODOT monitored weather surface sensor"
+      },
+      "WZDX_4_2": {
+        "required": [
+          "features",
+          "feedInfo",
+          "type"
+        ],
+        "type": "object",
+        "properties": {
+          "feedInfo": {
+            "$ref": "#/components/schemas/FeedInfo"
+          },
+          "features": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RoadEventFeature_4_2"
+            },
+            "description": "An array of GeoJSON Feature objects which represent WZDx road events"
+          },
+          "type": {
+            "minLength": 1,
+            "type": "string",
+            "description": "The GeoJSON type"
+          }
+        },
+        "additionalProperties": false,
+        "description": "The GeoJSON output of a WZDx Work Zone Feed (v4.2)"
+      },
+      "WeatherSensorSite": {
+        "required": [
+          "atmosphericSensors",
+          "averageAirTemperature",
+          "description",
+          "id",
+          "latitude",
+          "links",
+          "location",
+          "longitude",
+          "surfaceSensors"
+        ],
+        "type": "object",
+        "properties": {
+          "links": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Link"
+            },
+            "description": "Links related to the current item"
+          },
+          "id": {
+            "minLength": 1,
+            "type": "string",
+            "description": "Unique Identifier"
+          },
+          "latitude": {
+            "type": "number",
+            "description": "The angular distance of a place north or south of the earth's equator",
+            "format": "double"
+          },
+          "longitude": {
+            "type": "number",
+            "description": "The angular distance of a place east or west of the meridian at Greenwich, England",
+            "format": "double"
+          },
+          "location": {
+            "minLength": 1,
+            "type": "string",
+            "description": "Weather sensor site road or intersection"
+          },
+          "description": {
+            "minLength": 1,
+            "type": "string",
+            "description": "Weather sensor site description message"
+          },
+          "severe": {
+            "type": "boolean",
+            "description": "Indicates if severe weather detected"
+          },
+          "condition": {
+            "type": "string",
+            "description": "Condition if severe weather detected",
+            "nullable": true
+          },
+          "averageAirTemperature": {
+            "minLength": 1,
+            "type": "string",
+            "description": "Average of all atmospheric sensor temperatures in fahrenheit"
+          },
+          "atmosphericSensors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AtmosphericSensor"
+            },
+            "description": "List of atmospheric sensors"
+          },
+          "surfaceSensors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SurfaceSensor"
+            },
+            "description": "List of surface sensors"
+          }
+        },
+        "additionalProperties": false,
+        "description": "Weather sensor site represents an ODOT monitored weather sensor site with road and atmospheric sensors"
+      },
+      "WeatherSensorSiteApiResult": {
+        "required": [
+          "currentResultCount",
+          "lastUpdated",
+          "links",
+          "results",
+          "totalPageCount",
+          "totalResultCount"
+        ],
+        "type": "object",
+        "properties": {
+          "links": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Link"
+            },
+            "description": "Links related to the current API request"
+          },
+          "lastUpdated": {
+            "type": "string",
+            "description": "Date the data was last retrieved",
+            "format": "date-time"
+          },
+          "accecptedFilters": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/QueryParam"
+            },
+            "description": "Filters that were validated and applied",
+            "nullable": true
+          },
+          "rejectedFilters": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/QueryParam"
+            },
+            "description": "Filters that failed validation and were not applied",
+            "nullable": true
+          },
+          "totalPageCount": {
+            "type": "integer",
+            "description": "Total number of pages of data available. (Based on current page size)",
+            "format": "int32"
+          },
+          "totalResultCount": {
+            "type": "integer",
+            "description": "Total result count of the API request",
+            "format": "int32"
+          },
+          "currentResultCount": {
+            "type": "integer",
+            "description": "Number of results returned from the API (May vary from total results if pagination occurred)",
+            "format": "int32"
+          },
+          "results": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WeatherSensorSite"
+            },
+            "description": "List of the requested API data (cameras, construction, etc)"
+          }
+        },
+        "additionalProperties": false,
+        "description": "Result model for successful API request"
+      }
+    },
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  },
+  "security": [
+    {
+      "bearerAuth": [ ]
+    }
+  ],
+  "tags": [
+    {
+      "name": "Cameras"
+    },
+    {
+      "name": "Construction"
+    },
+    {
+      "name": "DangerousSlowdowns"
+    },
+    {
+      "name": "DigitalSigns"
+    },
+    {
+      "name": "Incidents"
+    },
+    {
+      "name": "TravelDelays"
+    },
+    {
+      "name": "WeatherSensorSites"
+    },
+    {
+      "name": "WorkZone"
+    }
+  ]
+}

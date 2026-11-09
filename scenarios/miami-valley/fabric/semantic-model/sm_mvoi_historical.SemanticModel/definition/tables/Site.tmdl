@@ -1,0 +1,63 @@
+/// Monitored public sites (venues, hospitals, airport, major employers). Locations are public; MVOI is not affiliated with any site (is_affiliated = false).
+table Site
+
+	column 'Site ID'
+		dataType: string
+		isKey
+		summarizeBy: none
+		sourceColumn: facility_id
+
+	column Site
+		dataType: string
+		summarizeBy: none
+		sourceColumn: facility_name
+
+	column 'Site Type'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: facility_type
+
+	column City
+		dataType: string
+		summarizeBy: none
+		dataCategory: City
+		sourceColumn: city
+
+	/// Site importance, 1 (low) to 5 (high) — scales the exposure score
+	column Criticality
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: criticality
+
+	column 'Primary Corridor'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: primary_corridor
+
+	column Latitude
+		dataType: double
+		summarizeBy: none
+		dataCategory: Latitude
+		sourceColumn: latitude
+
+	column Longitude
+		dataType: double
+		summarizeBy: none
+		dataCategory: Longitude
+		sourceColumn: longitude
+
+	column Address
+		dataType: string
+		summarizeBy: none
+		sourceColumn: address
+
+	column 'Is Affiliated'
+		dataType: boolean
+		summarizeBy: none
+		sourceColumn: is_affiliated
+
+	partition Site = entity
+		mode: directLake
+		source
+			entityName: silver_facilities
+			expressionSource: 'DirectLake - MVOI Lakehouse'

@@ -1,0 +1,138 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "/static/d/schema/89/dataSource.json",
+    "meta": { "schema_version": 89, "json_filename": "dataSource.json" },
+    "title": "Datasource schema",
+    "type": "object",
+    "properties": {
+        "dataSource": {
+            "type": "object",
+            "properties": {
+                "id": { "$ref": "dashboard.json#/$defs/uuid" },
+                "kind": { "type": "string" },
+                "name": {
+                    "$ref": "dashboard.json#/$defs/populatedString",
+                    "description": "The display name of the data source"
+                },
+                "queryResultsCacheMaxAge": {
+                    "type": "integer",
+                    "description": "Query results cache max age in ms",
+                    "minimum": 0,
+                    "errorMessage": {
+                        "type": "\"queryResultsCacheMaxAge\" is expected to be an integer >= 0",
+                        "minimum": "\"queryResultsCacheMaxAge\" is expected to be an integer >= 0"
+                    }
+                }
+            },
+            "required": ["kind", "id", "name"],
+            "oneOf": [
+                {
+                    "type": "object",
+                    "properties": {
+                        "kind": { "const": "manual-kusto" },
+                        "clusterUri": {
+                            "$ref": "dashboard.json#/$defs/populatedString",
+                            "description": "The cluster uri to the database. Example: \"https://help.kusto.windows.net\""
+                        },
+                        "database": {
+                            "$ref": "dashboard.json#/$defs/populatedString",
+                            "description": "The name of the database. Example: \"Samples\""
+                        }
+                    },
+                    "required": ["kind", "clusterUri", "database"],
+                    "errorMessage": {
+                        "required": "\"dataSources\" requires the following properties to be defined: [\"id\", \"name\", \"kind\", \"clusterUri\", \"database\"]"
+                    }
+                },
+                {
+                    "type": "object",
+                    "properties": {
+                        "kind": { "const": "kusto-trident" },
+                        "clusterUri": {
+                            "$ref": "dashboard.json#/$defs/populatedString",
+                            "description": "The cluster uri to the database. Example: \"https://trdp-rg7cwbb68mrcb6te8.z6.kusto.fabric.microsoft.com\""
+                        },
+                        "databaseArtifactId": {
+                            "$ref": "dashboard.json#/$defs/uuid",
+                            "description": "The Artifact ID of the database. Example: \"ac3ac59f-f78a-4d56-a4f5-6999d538d217\""
+                        },
+                        "database": {
+                            "$ref": "dashboard.json#/$defs/populatedString",
+                            "description": "The Artifact ID of the database (duplicate of databaseArtifactId for backward compatibility)"
+                        },
+                        "workspace": {
+                            "$ref": "dashboard.json#/$defs/populatedString",
+                            "description": "The Artifact ID of the workspace"
+                        }
+                    },
+                    "required": ["kind", "clusterUri", "databaseArtifactId", "database", "workspace"],
+                    "errorMessage": {
+                        "required": "\"dataSources\" requires the following properties to be defined: [\"id\", \"name\", \"kind\", \"clusterUri\", \"databaseArtifactId\", \"database\", \"workspace\"]"
+                    }
+                },
+                {
+                    "type": "object",
+                    "properties": {
+                        "kind": { "const": "azure-monitor" },
+                        "resourceType": {
+                            "$ref": "dashboard.json#/$defs/populatedString",
+                            "description": "The fully-qualified Azure resource type. Example: \"Microsoft.DocumentDB/databaseAccounts\""
+                        },
+                        "metricNamespace": {
+                            "$ref": "dashboard.json#/$defs/populatedString",
+                            "description": "The Azure Monitor metric namespace. Example: \"Microsoft.DocumentDB/databaseAccounts\""
+                        }
+                    },
+                    "required": ["kind", "resourceType", "metricNamespace"],
+                    "errorMessage": {
+                        "required": "\"dataSources\" requires the following properties to be defined: [\"id\", \"name\", \"kind\", \"resourceType\", \"metricNamespace\"]"
+                    }
+                },
+                {
+                    "type": "object",
+                    "properties": {
+                        "kind": { "const": "azure-resource-graph" },
+                        "resourceType": {
+                            "type": "string",
+                            "description": "Optional default resource type for this Resource Graph data source."
+                        }
+                    },
+                    "required": ["kind"]
+                },
+                {
+                    "type": "object",
+                    "properties": {
+                        "kind": { "const": "ontology" },
+                        "workspace": {
+                            "$ref": "dashboard.json#/$defs/populatedString",
+                            "description": "The Artifact ID of the workspace containing the ontology"
+                        },
+                        "ontology": {
+                            "$ref": "dashboard.json#/$defs/populatedString",
+                            "description": "The Artifact ID of the ontology"
+                        },
+                        "clusterUri": {
+                            "$ref": "dashboard.json#/$defs/populatedString",
+                            "description": "The cluster uri to the backing eventhouse. Example: \"https://trdp-rg7cwbb68mrcb6te8.z6.kusto.fabric.microsoft.com\""
+                        },
+                        "databaseArtifactId": {
+                            "$ref": "dashboard.json#/$defs/uuid",
+                            "description": "The Artifact ID of the backing eventhouse database. Example: \"ac3ac59f-f78a-4d56-a4f5-6999d538d217\""
+                        },
+                        "database": {
+                            "$ref": "dashboard.json#/$defs/populatedString",
+                            "description": "The resolved name of the backing eventhouse database"
+                        }
+                    },
+                    "required": ["kind", "workspace", "ontology", "clusterUri", "databaseArtifactId", "database"],
+                    "errorMessage": {
+                        "required": "\"dataSources\" requires the following properties to be defined: [\"id\", \"name\", \"kind\", \"workspace\", \"ontology\", \"clusterUri\", \"databaseArtifactId\", \"database\"]"
+                    }
+                }
+            ],
+            "errorMessage": {
+                "required": "\"dataSources\" requires the following properties to be defined: [\"id\", \"name\", \"kind\"]"
+            }
+        }
+    }
+}

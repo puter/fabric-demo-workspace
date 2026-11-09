@@ -1,0 +1,24 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "/static/d/schema/89/embeddedApp.json",
+    "meta": { "schema_version": 89, "json_filename": "embeddedApp.json" },
+    "title": "Embedded app schema",
+    "type": "object",
+    "properties": {
+        "embeddedApp": {
+            "type": "object",
+            "properties": {
+                "id": { "$ref": "dashboard.json#/$defs/uuid" },
+                "url": {
+                    "type": "string",
+                    "description": "The URL of the embedded app",
+                    "errorMessage": { "type": "Expected to be a string" }
+                }
+            },
+            "required": ["id", "url"],
+            "errorMessage": {
+                "type": "\"embeddedApps\" requires the following properties to be defined: [\"id\", \"url\"]"
+            }
+        }
+    }
+}

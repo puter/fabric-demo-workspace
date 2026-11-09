@@ -1,0 +1,51 @@
+relationship 'Incidents to Date (Start Date)'
+	fromColumn: Incidents.'Start Date'
+	toColumn: Date.Date
+
+relationship 'Incidents to Corridor (Corridor Key)'
+	fromColumn: Incidents.'Corridor Key'
+	toColumn: Corridor.Corridor
+
+relationship 'Corridor Daily to Date (Date Key)'
+	fromColumn: 'Corridor Daily'.'Date Key'
+	toColumn: Date.Date
+
+relationship 'Corridor Daily to Corridor (Corridor Key)'
+	fromColumn: 'Corridor Daily'.'Corridor Key'
+	toColumn: Corridor.Corridor
+
+relationship 'Site Disruption to Date (Date Key)'
+	fromColumn: 'Site Disruption'.'Date Key'
+	toColumn: Date.Date
+
+relationship 'Site Disruption to Site (Site Key)'
+	fromColumn: 'Site Disruption'.'Site Key'
+	toColumn: Site.'Site ID'
+
+relationship 'Site Proximity to Date (Date Key)'
+	fromColumn: 'Site Proximity'.'Date Key'
+	toColumn: Date.Date
+
+relationship 'Site Proximity to Site (Site Key)'
+	fromColumn: 'Site Proximity'.'Site Key'
+	toColumn: Site.'Site ID'
+
+relationship 'Weather Exposure to Date (Date Key)'
+	fromColumn: 'Weather Exposure'.'Date Key'
+	toColumn: Date.Date
+
+relationship 'Weather Exposure to Site (Site Key)'
+	fromColumn: 'Weather Exposure'.'Site Key'
+	toColumn: Site.'Site ID'
+
+relationship 'Incident Weather to Incidents (Occurrence Key)'
+	fromColumn: 'Incident Weather'.'Occurrence Key'
+	toColumn: Incidents.'Occurrence ID'
+
+relationship 'Pipeline Health to Date (Date Key)'
+	fromColumn: 'Pipeline Health'.'Date Key'
+	toColumn: Date.Date
+
+relationship 'Data Quality to Date (Date Key)'
+	fromColumn: 'Data Quality'.'Date Key'
+	toColumn: Date.Date

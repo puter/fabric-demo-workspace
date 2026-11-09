@@ -1,0 +1,92 @@
+/// Site travel-disruption exposure snapshots (emitted on material change). INFERRED from public traffic and weather data near the site; not a statement about the site's operations.
+table 'Site Disruption'
+
+	/// Highest disruption exposure score in context (0–100).
+	measure 'Peak Exposure Score' = MAX('Site Disruption'[Score])
+		formatString: 0.0
+		displayFolder: Exposure
+
+	/// Mean of exposure snapshots in context (snapshots are change-driven, so this is indicative).
+	measure 'Average Exposure Score' = AVERAGE('Site Disruption'[Score])
+		formatString: 0.0
+		displayFolder: Exposure
+
+	/// Snapshots at or above the alert threshold (70).
+	measure 'High Exposure Snapshots' = CALCULATE(COUNTROWS('Site Disruption'), 'Site Disruption'[Score] >= 70)
+		formatString: #,##0
+		displayFolder: Exposure
+
+	/// Share of raw exposure points contributed by weather alerts.
+	measure 'Weather Share of Exposure' = DIVIDE(SUM('Site Disruption'[Weather Points]), SUM('Site Disruption'[Incident Points]) + SUM('Site Disruption'[Road Closure Points]) + SUM('Site Disruption'[Slowdown Points]) + SUM('Site Disruption'[Weather Points]) + SUM('Site Disruption'[History Points]))
+		formatString: 0.0%
+		displayFolder: Exposure
+
+	column 'Site Key'
+		dataType: string
+		isHidden
+		summarizeBy: none
+		sourceColumn: facility_id
+
+	column 'Date Key'
+		dataType: dateTime
+		isHidden
+		summarizeBy: none
+		sourceColumn: risk_date
+
+	column 'Scored At'
+		dataType: dateTime
+		formatString: yyyy-mm-dd hh:nn
+		summarizeBy: none
+		sourceColumn: observed_at
+
+	column Score
+		dataType: double
+		isHidden
+		summarizeBy: none
+		sourceColumn: score
+
+	column Band
+		dataType: string
+		summarizeBy: none
+		sourceColumn: band
+
+	column 'Incident Points'
+		dataType: double
+		isHidden
+		summarizeBy: none
+		sourceColumn: incident_points
+
+	column 'Road Closure Points'
+		dataType: double
+		isHidden
+		summarizeBy: none
+		sourceColumn: road_closure_points
+
+	column 'Slowdown Points'
+		dataType: double
+		isHidden
+		summarizeBy: none
+		sourceColumn: slowdown_points
+
+	column 'Weather Points'
+		dataType: double
+		isHidden
+		summarizeBy: none
+		sourceColumn: weather_points
+
+	column 'History Points'
+		dataType: double
+		isHidden
+		summarizeBy: none
+		sourceColumn: history_points
+
+	column Explanation
+		dataType: string
+		summarizeBy: none
+		sourceColumn: explanation
+
+	partition 'Site Disruption' = entity
+		mode: directLake
+		source
+			entityName: gold_facility_risk_history
+			expressionSource: 'DirectLake - MVOI Lakehouse'

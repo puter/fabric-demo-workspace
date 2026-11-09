@@ -1,0 +1,21 @@
+facility_id,facility_name,facility_type,latitude,longitude,city,criticality,primary_corridor,address,description,is_affiliated
+FAC-001,Sinclair Conference Center,venue,39.75844,-84.19807,Dayton,5,I-75,"444 W Third St, Dayton, OH 45402",Conference venue at Sinclair Community College (demo host site),false
+FAC-002,Dayton International Airport,airport,39.89784,-84.22565,Vandalia,5,I-70,"3600 Terminal Rd, Vandalia, OH 45377",Regional commercial airport,false
+FAC-003,Dayton Convention Center,venue,39.75677,-84.19063,Dayton,4,I-75,"22 E Fifth St, Dayton, OH 45402",Downtown convention venue,false
+FAC-004,Day Air Ballpark,venue,39.76352,-84.18737,Dayton,3,I-75,"220 N Patterson Blvd, Dayton, OH 45402",Downtown baseball stadium,false
+FAC-005,University of Dayton Arena,venue,39.73364,-84.19974,Dayton,3,I-75,"1801 S Edwin C Moses Blvd, Dayton, OH 45417",Arena and event venue,false
+FAC-006,Carillon Historical Park,landmark,39.73024,-84.20069,Dayton,2,I-75,"1000 Carillon Blvd, Dayton, OH 45409",History museum and park,false
+FAC-007,Hobart Arena,venue,40.04614,-84.20587,Troy,2,I-75,"255 Adams St, Troy, OH 45373",Arena and event venue,false
+FAC-008,Miami Valley Hospital,hospital,39.74378,-84.18742,Dayton,5,I-75,"1 Wyoming St, Dayton, OH 45409",Hospital and regional trauma center,false
+FAC-009,Kettering Health Main Campus,hospital,39.69858,-84.19053,Kettering,5,SR-48,"3535 Southern Blvd, Kettering, OH 45429",Hospital,false
+FAC-010,Upper Valley Medical Center,hospital,40.08959,-84.22422,Troy,4,I-75,"3130 N County Rd 25A, Troy, OH 45373",Hospital,false
+FAC-011,The Greene Town Center,retail,39.69312,-84.10267,Beavercreek,3,I-675,"4452 Buckeye Ln, Beavercreek, OH 45440",Shopping and entertainment district,false
+FAC-012,CareSource Headquarters,employer,39.76284,-84.19251,Dayton,4,I-75,"230 N Main St, Dayton, OH 45402",Downtown corporate headquarters,false
+FAC-013,Fuyao Glass America,employer,39.69730,-84.21870,Moraine,4,I-75,"2801 W Stroop Rd, Moraine, OH 45439",Automotive glass manufacturing plant,false
+FAC-014,DMAX,employer,39.70705,-84.22422,Moraine,4,I-75,"3100 Dryden Rd, Moraine, OH 45439",Diesel engine manufacturing plant,false
+FAC-015,LexisNexis Miamisburg,employer,39.61449,-84.22746,Miamisburg,3,I-75,"9443 Springboro Pike, Miamisburg, OH 45342",Corporate campus,false
+FAC-016,Speedway Headquarters,employer,39.88671,-83.93590,Enon,3,I-70,"500 Speedway Dr, Enon, OH 45323",Corporate headquarters,false
+FAC-017,Navistar Springfield Assembly,employer,40.01498,-83.79054,Springfield,4,US-68,"6125 Urbana Rd, Springfield, OH 45502",Truck assembly plant,false
+FAC-018,ITW Food Equipment Group (Hobart),employer,40.03561,-84.21650,Troy,3,I-75,"701 S Ridge Ave, Troy, OH 45373",Food equipment manufacturing,false
+FAC-019,Cargill Dayton,employer,39.82010,-84.17134,Dayton,3,I-75,"3201 Needmore Rd, Dayton, OH 45414",Corn milling plant,false
+FAC-020,Dayton Freight Lines Headquarters,employer,39.84112,-84.18900,Dayton,3,I-75,"6450 Poe Ave, Dayton, OH 45414",Trucking company headquarters and terminal,false

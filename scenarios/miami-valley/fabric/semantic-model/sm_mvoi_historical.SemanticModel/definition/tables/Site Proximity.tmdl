@@ -1,0 +1,63 @@
+/// Incident occurrences within the scoring distance of each site (geodesic).
+table 'Site Proximity'
+
+	/// Distinct occurrences near the site in context.
+	measure 'Nearby Incident Occurrences' = DISTINCTCOUNT('Site Proximity'[Occurrence Key])
+		formatString: #,##0
+		displayFolder: Proximity
+
+	/// Mean distance from site to nearby occurrences, in miles.
+	measure 'Average Distance Miles' = DIVIDE(AVERAGE('Site Proximity'[Distance Meters]), 1609.344)
+		formatString: #,##0.00
+		displayFolder: Proximity
+
+	column 'Occurrence Key'
+		dataType: string
+		isHidden
+		summarizeBy: none
+		sourceColumn: occurrence_id
+
+	column 'Site Key'
+		dataType: string
+		isHidden
+		summarizeBy: none
+		sourceColumn: facility_id
+
+	column 'Date Key'
+		dataType: dateTime
+		isHidden
+		summarizeBy: none
+		sourceColumn: start_date
+
+	column 'Distance Meters'
+		dataType: double
+		isHidden
+		summarizeBy: none
+		sourceColumn: distance_m
+
+	/// Inside the full-weight radius (default 1 mile)
+	column 'Within Full Weight'
+		dataType: boolean
+		summarizeBy: none
+		sourceColumn: within_full_weight
+
+	column 'Peak Severity'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: peak_severity
+
+	column 'Road Closure'
+		dataType: boolean
+		summarizeBy: none
+		sourceColumn: had_road_closure
+
+	column 'Spatial Engine'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: spatial_engine
+
+	partition 'Site Proximity' = entity
+		mode: directLake
+		source
+			entityName: gold_facility_proximity
+			expressionSource: 'DirectLake - MVOI Lakehouse'

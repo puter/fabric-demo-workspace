@@ -1,0 +1,62 @@
+# Copy to settings.yaml (gitignored) or set the equivalent MVOI_* environment
+# variables. Secrets are NEVER stored here: they come from environment
+# variables or Azure Key Vault (see docs/deployment.md).
+
+environment: dev              # dev | demo | prod (tagged on every event)
+run_mode: live                # live | replay
+
+polling:
+  interval_seconds: 60        # OHGO poll cadence (see docs/data-sources.md)
+  nws_interval_seconds: 120   # NWS alerts change less often; be polite
+  http_timeout_seconds: 20
+  max_retries: 4
+  backoff_base_seconds: 2
+  backoff_max_seconds: 60
+
+ohgo:
+  base_url: https://publicapi.ohgo.com
+  # api_key: from env OHGO_API_KEY or Key Vault secret `ohgo-api-key`
+  resources: [incidents, construction, dangerous-slowdowns, travel-delays]
+  use_etag: true
+
+nws:
+  base_url: https://api.weather.gov
+  # NWS requires a User-Agent identifying the application and a contact.
+  user_agent: "MiamiValleyOpsIntelligence/0.1 (set MVOI_NWS__USER_AGENT to include a contact email)"
+
+lifecycle:
+  # An event is only marked resolved after it has been absent from this many
+  # consecutive SUCCESSFUL polls AND for at least this many minutes.
+  resolve_after_missed_polls: 3
+  resolve_after_minutes: 5
+  # Guard against partial/failed upstream responses: if a poll returns fewer
+  # than this fraction of the previously active count, skip resolution.
+  min_result_ratio_for_resolution: 0.5
+  # ...but a low count that persists this long is real (traffic cleared).
+  max_resolution_suppression_minutes: 15
+
+state:
+  path: .state/mvoi_state.sqlite
+
+publisher:
+  kind: stdout                # stdout | file | eventhub
+  file_path: .state/events.jsonl
+  # eventhub: connection string from env MVOI_EVENTSTREAM_CONNECTION_STRING
+  # or Key Vault secret `eventstream-connection-string`.
+  batch_max_events: 200
+  retry_initial_seconds: 30   # outbox retry backoff while publishing fails,
+  retry_max_seconds: 300      # doubling up to this; polling continues meanwhile
+
+risk:
+  enabled: true
+  emit_every_cycle: false     # false: only on material change
+  min_score_delta: 5
+  # JSON {facility_id: distinct incidents nearby in trailing window}, exported
+  # by nb_mvoi_gold_build. Missing file => history component is 0.
+  history_baseline_path: null
+
+key_vault:
+  url: null                   # e.g. https://kv-example.vault.azure.net/
+
+health:
+  port: 8080                  # /healthz and /metrics (0 to disable)

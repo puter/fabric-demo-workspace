@@ -1,0 +1,71 @@
+# Facility operational-risk scoring (explainable weighted model).
+#
+# score = min(100, criticality_multiplier * (incident + closure + slowdown + weather + history))
+#
+# Every component is capped, every contribution is stored, and the explanation
+# names the largest contributors. The score measures INFERRED EXPOSURE from
+# proximity. It is not evidence of an actual delivery delay or route disruption.
+
+version: 1
+
+distance_bands_m:
+  # Contributions decay linearly from `full` (100%) to `max` (0%).
+  full: 1600     # ~1 mile
+  max: 8000      # ~5 miles
+
+incident:
+  # Points per active event at full distance weight, by normalised severity.
+  points_by_severity:
+    critical: 30
+    major: 20
+    moderate: 10
+    minor: 4
+  cap: 45
+
+road_closure:
+  # Extra points when a nearby event closes the road.
+  points: 15
+  cap: 25
+
+slowdown:
+  # Dangerous slowdowns and travel delays (sensor-detected congestion).
+  points: 6
+  cap: 15
+
+weather:
+  # Facility point inside an active NWS alert polygon or zone.
+  points_by_severity:
+    Extreme: 35
+    Severe: 25
+    Moderate: 12
+    Minor: 5
+    Unknown: 3
+  cap: 35
+
+history:
+  # Distinct incident occurrences within `radius_m` in the trailing window
+  # (gold_facility_history_baseline, refreshed hourly).
+  radius_m: 3200
+  window_days: 30
+  points_per_occurrence: 1.5
+  cap: 15
+
+criticality_multiplier:
+  1: 0.70
+  2: 0.85
+  3: 1.00
+  4: 1.15
+  5: 1.30
+
+bands:
+  # Lower bound inclusive.
+  low: 0
+  guarded: 25
+  elevated: 50
+  high: 70
+  severe: 85
+
+alerting:
+  raise_threshold: 70
+  clear_threshold: 60        # hysteresis: must fall below this to clear
+  min_reraise_minutes: 30    # suppress repeat raises for the same facility

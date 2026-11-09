@@ -1,0 +1,24 @@
+# Keep the build context to what the Dockerfile copies. Mirrors .gitignore,
+# plus source that is not needed in the poller image.
+
+# Local environment and state (.gitignore)
+.state/
+config/settings.yaml
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+tests/fixtures/live/
+dist/
+
+# Not used by the image
+.git/
+.gitignore
+.dockerignore
+Dockerfile
+docs/
+fabric/
+infrastructure/
+scripts/
+tests/

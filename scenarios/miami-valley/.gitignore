@@ -1,0 +1,9 @@
+.state/
+config/settings.yaml
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+tests/fixtures/live/
+dist/

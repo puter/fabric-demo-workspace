@@ -1,0 +1,422 @@
+// =============================================================================
+// kqldb_mvoi — Eventhouse KQL database schema for Miami Valley Ops Intelligence
+//
+// Deployed by scripts/deploy_fabric.py with `.execute database script`.
+// Every command is idempotent (create-merge / create-or-alter), so re-running
+// is safe.
+//
+// Landing: Eventstream (custom endpoint -> Eventhouse destination,
+// ProcessedIngestion — the API-automatable mode) writes the canonical event
+// contract (docs/data-contracts.md) one row per event into `Events`, matching
+// columns by name. `Events_json` is kept for DirectIngestion, which needs a
+// UI-created data connection (see docs/deployment.md).
+// =============================================================================
+
+.create-merge table Events (
+    schema_version: string,
+    event_id: string,
+    entity_key: string,
+    source: string,
+    entity_type: string,
+    source_id: string,
+    change_type: string,
+    environment: string,
+    run_mode: string,
+    replay_session_id: string,
+    observed_at: datetime,
+    source_updated_at: datetime,
+    first_seen_at: datetime,
+    last_seen_at: datetime,
+    start_time: datetime,
+    end_time: datetime,
+    ingested_at: datetime,
+    latitude: real,
+    longitude: real,
+    geometry_geojson: string,
+    route_name: string,
+    corridor_id: string,
+    direction: string,
+    location: string,
+    category: string,
+    status: string,
+    severity: string,
+    severity_rank: int,
+    is_road_closure: bool,
+    title: string,
+    description: string,
+    attributes: dynamic,
+    content_hash: string,
+    raw: dynamic,
+    // Added by Eventstream ProcessedIngestion
+    EventProcessedUtcTime: datetime,
+    PartitionId: long,
+    EventEnqueuedUtcTime: datetime
+) with (docstring = "Canonical MVOI events from Eventstream (live + replay)", folder = "Landing")
+
+.create-or-alter table Events ingestion json mapping "Events_json"
+```
+[
+ {"column":"schema_version","path":"$.schema_version","datatype":"string"},
+ {"column":"event_id","path":"$.event_id","datatype":"string"},
+ {"column":"entity_key","path":"$.entity_key","datatype":"string"},
+ {"column":"source","path":"$.source","datatype":"string"},
+ {"column":"entity_type","path":"$.entity_type","datatype":"string"},
+ {"column":"source_id","path":"$.source_id","datatype":"string"},
+ {"column":"change_type","path":"$.change_type","datatype":"string"},
+ {"column":"environment","path":"$.environment","datatype":"string"},
+ {"column":"run_mode","path":"$.run_mode","datatype":"string"},
+ {"column":"replay_session_id","path":"$.replay_session_id","datatype":"string"},
+ {"column":"observed_at","path":"$.observed_at","datatype":"datetime"},
+ {"column":"source_updated_at","path":"$.source_updated_at","datatype":"datetime"},
+ {"column":"first_seen_at","path":"$.first_seen_at","datatype":"datetime"},
+ {"column":"last_seen_at","path":"$.last_seen_at","datatype":"datetime"},
+ {"column":"start_time","path":"$.start_time","datatype":"datetime"},
+ {"column":"end_time","path":"$.end_time","datatype":"datetime"},
+ {"column":"ingested_at","path":"$.ingested_at","datatype":"datetime"},
+ {"column":"latitude","path":"$.latitude","datatype":"real"},
+ {"column":"longitude","path":"$.longitude","datatype":"real"},
+ {"column":"geometry_geojson","path":"$.geometry_geojson","datatype":"string"},
+ {"column":"route_name","path":"$.route_name","datatype":"string"},
+ {"column":"corridor_id","path":"$.corridor_id","datatype":"string"},
+ {"column":"direction","path":"$.direction","datatype":"string"},
+ {"column":"location","path":"$.location","datatype":"string"},
+ {"column":"category","path":"$.category","datatype":"string"},
+ {"column":"status","path":"$.status","datatype":"string"},
+ {"column":"severity","path":"$.severity","datatype":"string"},
+ {"column":"severity_rank","path":"$.severity_rank","datatype":"int"},
+ {"column":"is_road_closure","path":"$.is_road_closure","datatype":"bool"},
+ {"column":"title","path":"$.title","datatype":"string"},
+ {"column":"description","path":"$.description","datatype":"string"},
+ {"column":"attributes","path":"$.attributes","datatype":"dynamic"},
+ {"column":"content_hash","path":"$.content_hash","datatype":"string"},
+ {"column":"raw","path":"$.raw","datatype":"dynamic"}
+]
+```
+
+// Hot window for the operational dashboard; the Lakehouse holds long history.
+.alter-merge table Events policy retention softdelete = 30d recoverability = disabled
+.alter table Events policy caching hot = 7d
+.alter table Events policy streamingingestion enable
+
+// Latest state per entity (per run partition). Duplicated deliveries share
+// event_id and content, so arg_max is unaffected by at-least-once delivery.
+.create ifnotexists materialized-view with (backfill = true, docString = "Latest event per entity", folder = "State")
+EntityLatest on table Events
+{
+    Events
+    | summarize arg_max(observed_at, *) by entity_key, run_mode, replay_session_id
+}
+
+// ----------------------------------------------------------------------------- reference data
+// Loaded (replace) by scripts/deploy_fabric.py from reference-data/.
+// Facilities is dropped and recreated so column changes apply; it holds only reloaded reference rows.
+
+.drop table Facilities ifexists
+
+.create table Facilities (
+    facility_id: string, facility_name: string, facility_type: string,
+    latitude: real, longitude: real, city: string, criticality: int,
+    primary_corridor: string, address: string, description: string, is_affiliated: bool
+) with (docstring = "Monitored public sites: venues, hospitals, airport, employers. Not affiliated with MVOI (reference)", folder = "Reference")
+
+.create-merge table Zones (
+    zone_id: string, zone_type: string, name: string, geometry: dynamic
+) with (docstring = "NWS forecast/county zones in the AOI (reference)", folder = "Reference")
+
+.create-merge table Corridors (
+    corridor_id: string, corridor_name: string, geometry: dynamic
+) with (docstring = "TIGER/Line corridor geometry clipped to AOI (reference)", folder = "Reference")
+
+// ----------------------------------------------------------------------------- partition helpers
+
+.create-or-alter function with (folder = "Core", docstring = "Session id of the most recent replay")
+LatestReplaySession() {
+    toscalar(Events
+        | where run_mode == "replay" and ingested_at > ago(1d)
+        | summarize arg_max(ingested_at, replay_session_id)
+        | project replay_session_id)
+}
+
+// mode: "live" or "replay" (replay = latest replay session only). Any other
+// value fails the query: mode is every function's first argument, so a
+// positional call such as NewIncidents(24h) would otherwise match no rows and
+// return an empty result instead of an error.
+.create-or-alter function with (folder = "Core", docstring = "Events for one run partition")
+EventsFor(mode: string = "live") {
+    let session = iff(mode == "replay", LatestReplaySession(), "");
+    Events
+    | where assert(mode in ("live", "replay"), "mode must be live or replay; pass other arguments by name")
+    | where run_mode == mode and (mode == "live" or replay_session_id == session)
+}
+
+.create-or-alter function with (folder = "Core", docstring = "Latest state per entity for one run partition, before ADR 0005 reconciliation")
+LatestUnreconciled(mode: string = "live") {
+    let session = iff(mode == "replay", LatestReplaySession(), "");
+    EntityLatest
+    | where assert(mode in ("live", "replay"), "mode must be live or replay; pass other arguments by name")
+    | where run_mode == mode and (mode == "live" or replay_session_id == session)
+}
+
+.create-or-alter function with (folder = "Core", docstring = "Latest heartbeat active-key snapshot per environment (ADR 0005)")
+ActiveKeySnapshots(mode: string = "live") {
+    LatestUnreconciled(mode)
+    | where entity_type == "ingestion_heartbeat" and isnotnull(attributes.active_keys)
+    | summarize arg_max(observed_at, attributes) by environment
+    | project environment, snapshot_at = observed_at, snapshot_keys = attributes.active_keys
+}
+
+// Rows the poller no longer tracks are hidden (ADR 0005): the latest heartbeat
+// per environment lists every active key of each tracked type, so a row of a
+// listed type whose key is missing, and that is no newer than the heartbeat,
+// lost its resolve event in delivery. With no such heartbeat nothing is hidden.
+.create-or-alter function with (folder = "Core", docstring = "Latest state per entity for one run partition")
+LatestFor(mode: string = "live") {
+    LatestUnreconciled(mode)
+    | join kind=leftouter ActiveKeySnapshots(mode) on environment
+    | extend _tracked = snapshot_keys[entity_type]
+    | where isnull(_tracked) or change_type == "resolved" or observed_at > snapshot_at
+        or set_has_element(_tracked, entity_key)
+    | project-away environment1, snapshot_at, snapshot_keys, _tracked
+}
+
+// ----------------------------------------------------------------------------- operational queries
+
+.create-or-alter function with (folder = "Operations", docstring = "Currently active transportation events")
+ActiveIncidents(mode: string = "live") {
+    LatestFor(mode)
+    | where entity_type in ("incident", "construction", "dangerous_slowdown", "travel_delay")
+    | where change_type != "resolved"
+    | extend minutes_active = datetime_diff("minute", now(), first_seen_at)
+    | project entity_key, entity_type, category, severity, severity_rank, is_road_closure,
+              route_name, corridor_id, direction, location, ['title'], description,
+              latitude, longitude, first_seen_at, last_seen_at, minutes_active, status,
+              first_seen_eastern = datetime_utc_to_local(first_seen_at, "America/New_York"),
+              synthetic = tobool(attributes.synthetic)
+}
+
+.create-or-alter function with (folder = "Operations", docstring = "Transportation events first seen in the lookback window")
+NewIncidents(mode: string = "live", lookback: timespan = 60m) {
+    EventsFor(mode)
+    | where entity_type in ("incident", "construction", "dangerous_slowdown", "travel_delay")
+    | where change_type in ("created", "reopened") and observed_at > ago(lookback)
+    | summarize arg_max(observed_at, *) by entity_key
+    | project observed_at, entity_key, entity_type, category, severity, corridor_id, route_name,
+              location, ['title'], latitude, longitude
+}
+
+.create-or-alter function with (folder = "Operations", docstring = "New incident counts for 15/30/60 minute windows")
+NewIncidentWindows(mode: string = "live") {
+    EventsFor(mode)
+    | where entity_type in ("incident", "construction", "dangerous_slowdown", "travel_delay")
+    | where change_type in ("created", "reopened") and observed_at > ago(60m)
+    | summarize
+        last_15m = dcountif(entity_key, observed_at > ago(15m)),
+        last_30m = dcountif(entity_key, observed_at > ago(30m)),
+        last_60m = dcount(entity_key)
+}
+
+.create-or-alter function with (folder = "Operations", docstring = "Active events per corridor")
+IncidentCountsByCorridor(mode: string = "live") {
+    ActiveIncidents(mode)
+    | summarize active = count(), closures = countif(is_road_closure),
+                major_or_worse = countif(severity_rank >= 3)
+        by corridor = coalesce(corridor_id, "Other / unmatched")
+    | order by active desc
+}
+
+.create-or-alter function with (folder = "Operations", docstring = "Active events by severity")
+IncidentsBySeverity(mode: string = "live") {
+    ActiveIncidents(mode)
+    | summarize active = count() by severity, severity_rank, entity_type
+    | order by severity_rank desc
+}
+
+.create-or-alter function with (folder = "Operations", docstring = "Distinct events arriving per bin")
+EventArrivalRate(mode: string = "live", lookback: timespan = 6h, bin_size: timespan = 5m) {
+    EventsFor(mode)
+    | where ingested_at > ago(lookback)
+    | summarize events = dcount(event_id) by bin(ingested_at, bin_size), entity_type
+    | order by ingested_at asc
+}
+
+.create-or-alter function with (folder = "Operations", docstring = "Active NWS alerts with their geometry")
+ActiveWeatherAlerts(mode: string = "live") {
+    LatestFor(mode)
+    | where entity_type == "weather_alert" and change_type != "resolved"
+    | where isnull(end_time) or end_time > now()
+    | project entity_key, event = category, cap_severity = tostring(attributes.cap_severity),
+              severity, severity_rank, headline = ['title'], area = location, onset = start_time,
+              expires = end_time, onset_eastern = datetime_utc_to_local(start_time, "America/New_York"),
+              expires_eastern = datetime_utc_to_local(end_time, "America/New_York"),
+              latitude, longitude, geometry = parse_json(geometry_geojson),
+              geometry_source = tostring(attributes.geometry_source),
+              aoi_zones = attributes.aoi_zones
+}
+
+.create-or-alter function with (folder = "Operations", docstring = "Active NWS alerts per county/zone")
+WeatherAlertsByRegion(mode: string = "live") {
+    ActiveWeatherAlerts(mode)
+    | mv-expand zone_id = aoi_zones to typeof(string)
+    | join kind=leftouter (Zones | project zone_id, zone_name = name, zone_type) on zone_id
+    | summarize alerts = dcount(entity_key), events = make_set(event),
+                worst_severity_rank = max(severity_rank)
+        by region = coalesce(zone_name, "Polygon only"), zone_type
+    | order by worst_severity_rank desc, alerts desc
+}
+
+.create-or-alter function with (folder = "Risk", docstring = "Current facility risk (latest snapshot per facility)")
+CurrentFacilityRisk(mode: string = "live") {
+    LatestFor(mode)
+    | where entity_type == "facility_risk"
+    | project facility_id = source_id, facility_name = ['title'], city = location,
+              score = todouble(attributes.score), band = status,
+              incident_points = todouble(attributes.incident_points),
+              road_closure_points = todouble(attributes.road_closure_points),
+              slowdown_points = todouble(attributes.slowdown_points),
+              weather_points = todouble(attributes.weather_points),
+              history_points = todouble(attributes.history_points),
+              criticality = toint(attributes.criticality),
+              explanation = description, latitude, longitude, scored_at = observed_at,
+              scored_at_eastern = datetime_utc_to_local(observed_at, "America/New_York"),
+              exposure_type = tostring(attributes.exposure_type)
+    | order by score desc
+}
+
+.create-or-alter function with (folder = "Risk", docstring = "Active incidents within radius_m of one site (default 8 km, the scoring max distance), nearest and most severe first")
+IncidentsNearSite(mode: string = "live", site: string = "Sinclair Conference Center", radius_m: real = 8000.0) {
+    let s = toscalar(Facilities | where facility_name == site | take 1 | project pack("lat", latitude, "lon", longitude));
+    ActiveIncidents(mode)
+    | extend distance_m = geo_distance_2points(longitude, latitude, todouble(s.lon), todouble(s.lat))
+    | where distance_m <= radius_m
+    | extend distance_mi = round(distance_m / 1609.344, 1)
+    | order by severity_rank desc, distance_m asc
+}
+
+.create-or-alter function with (folder = "Risk", docstring = "Facility risk over time")
+FacilityRiskTimeline(mode: string = "live", lookback: timespan = 24h) {
+    EventsFor(mode)
+    | where entity_type == "facility_risk" and observed_at > ago(lookback)
+    | project observed_at, facility_id = source_id, facility_name = ['title'],
+              score = todouble(attributes.score), band = status
+    | order by observed_at asc
+}
+
+.create-or-alter function with (folder = "Risk", docstring = "Regional operational risk index over time")
+RegionalRiskTrend(mode: string = "live", lookback: timespan = 24h, bin_size: timespan = 5m) {
+    // Risk snapshots are emitted on change only, so carry the last value forward per facility.
+    let snaps = EventsFor(mode)
+        | where entity_type == "facility_risk" and observed_at > ago(lookback)
+        | project observed_at, facility_id = source_id, score = todouble(attributes.score);
+    snaps
+    | make-series score = max(score) default = real(null)
+        on observed_at from ago(lookback) to now() step bin_size by facility_id
+    | extend score = series_fill_forward(score)
+    | mv-expand observed_at to typeof(datetime), score to typeof(real)
+    | summarize mean_score = avg(coalesce(score, 0.0)), max_score = max(coalesce(score, 0.0)),
+                elevated_facilities = countif(score >= 50) by observed_at
+    | order by observed_at asc
+}
+
+.create-or-alter function with (folder = "Alerts", docstring = "Currently open operational alerts")
+OpenAlerts(mode: string = "live") {
+    LatestFor(mode)
+    | where entity_type == "operational_alert" and status == "raised"
+    | project raised_at = observed_at, raised_at_eastern = datetime_utc_to_local(observed_at, "America/New_York"),
+              alert_type = category, alert_key = source_id,
+              facility_id = tostring(attributes.facility_id),
+              facility_name = tostring(attributes.facility_name), message = ['title'],
+              latitude, longitude
+    | order by raised_at desc
+}
+
+.create-or-alter function with (folder = "Operations", docstring = "Most recent events for the activity feed")
+RecentActivity(mode: string = "live", n: int = 50) {
+    EventsFor(mode)
+    | where entity_type != "ingestion_heartbeat"
+    | top n by ingested_at desc
+    | project ingested_at, entity_type, change_type, severity, corridor_id, ['title'], location, status
+}
+
+// ----------------------------------------------------------------------------- observability
+
+.create-or-alter function with (folder = "Observability", docstring = "Freshness of the poller and each source")
+IngestionFreshness(mode: string = "live") {
+    // Each heartbeat lists only the sources polled in that cycle, so take the
+    // latest row per source. The window is relative to the newest heartbeat so
+    // a stopped poller still shows its last known state.
+    let heartbeats = EventsFor(mode) | where entity_type == "ingestion_heartbeat";
+    let newest = toscalar(heartbeats | summarize max(ingested_at));
+    heartbeats
+    | where ingested_at > newest - 1h
+    | mv-expand poll = attributes.polls
+    | extend poll_source = strcat(tostring(poll.source), ":", tostring(poll.entity_type))
+    | summarize arg_max(ingested_at, status, poll, attributes) by poll_source
+    | project heartbeat_at = ingested_at,
+              minutes_since_heartbeat = datetime_diff("second", now(), ingested_at) / 60.0,
+              service_status = status,
+              source = poll_source,
+              last_success_at = todatetime(poll.last_success_at),
+              minutes_since_success = datetime_diff("second", now(), todatetime(poll.last_success_at)) / 60.0,
+              consecutive_failures = toint(poll.consecutive_failures),
+              last_error = tostring(poll.error), outbox_depth = toint(attributes.outbox_depth)
+}
+
+.create-or-alter function with (folder = "Observability", docstring = "1 row when no live heartbeat within threshold (Activator)")
+IngestionStale(threshold: timespan = 5m) {
+    let last_hb = toscalar(Events
+        | where run_mode == "live" and entity_type == "ingestion_heartbeat"
+        | summarize max(ingested_at));
+    print last_heartbeat = last_hb, stale = isnull(last_hb) or last_hb < ago(threshold),
+          minutes_since = datetime_diff("second", now(), last_hb) / 60.0
+    | where stale
+}
+
+.create-or-alter function with (folder = "Observability", docstring = "Source-to-Eventhouse latency")
+IngestionLatency(mode: string = "live", lookback: timespan = 6h) {
+    EventsFor(mode)
+    | where ingested_at > ago(lookback) and entity_type != "ingestion_heartbeat"
+    | extend poll_to_publish_s = datetime_diff("millisecond", ingested_at, observed_at) / 1000.0,
+             publish_to_eventhouse_s = datetime_diff("millisecond", ingestion_time(), ingested_at) / 1000.0
+    | summarize p50_poll_to_publish_s = percentile(poll_to_publish_s, 50),
+                p95_poll_to_publish_s = percentile(poll_to_publish_s, 95),
+                p50_publish_to_eventhouse_s = percentile(publish_to_eventhouse_s, 50),
+                p95_publish_to_eventhouse_s = percentile(publish_to_eventhouse_s, 95)
+        by bin(ingested_at, 15m)
+}
+
+.create-or-alter function with (folder = "Observability", docstring = "Data-quality summary from heartbeats")
+DataQualitySummary(mode: string = "live", lookback: timespan = 24h) {
+    EventsFor(mode)
+    | where entity_type == "ingestion_heartbeat" and ingested_at > ago(lookback)
+    | mv-expand poll = attributes.polls
+    | summarize polls = count(), failed_polls = countif(tobool(poll.ok) == false),
+                not_modified = countif(tobool(poll.not_modified)),
+                observations = sum(toint(poll.observations)), rejected = sum(toint(poll.rejected)),
+                suppressed_resolutions = countif(tobool(poll.resolution_suppressed)),
+                p95_latency_ms = percentile(todouble(poll.elapsed_ms), 95)
+        by source = strcat(tostring(poll.source), ":", tostring(poll.entity_type))
+    | extend rejection_rate = iff(observations + rejected == 0, 0.0,
+                                  todouble(rejected) / (observations + rejected))
+}
+
+// hidden_rows: active rows LatestFor hides because the poller no longer tracks them
+// (their resolve event was lost). missing_keys: keys the poller tracks as active
+// that have no active row here (their created/updated event was lost).
+.create-or-alter function with (folder = "Observability", docstring = "Disagreement between the poller's active keys and the Eventhouse (ADR 0005)")
+ActiveSetDrift(mode: string = "live") {
+    let snapshots = ActiveKeySnapshots(mode);
+    let active = LatestUnreconciled(mode) | where change_type != "resolved";
+    let hidden = active
+        | join kind=inner snapshots on environment
+        | extend _tracked = snapshot_keys[entity_type]
+        | where isnotnull(_tracked) and observed_at <= snapshot_at and not(set_has_element(_tracked, entity_key))
+        | project environment, entity_type, hidden_rows = 1, missing_keys = 0;
+    let lost = snapshots
+        | mv-expand kind = array kv = snapshot_keys
+        | extend entity_type = tostring(kv[0])
+        | mv-expand entity_key = kv[1] to typeof(string)
+        | join kind=leftanti active on environment, entity_key
+        | project environment, entity_type, hidden_rows = 0, missing_keys = 1;
+    union hidden, lost
+    | summarize hidden_rows = sum(hidden_rows), missing_keys = sum(missing_keys) by environment, entity_type
+}

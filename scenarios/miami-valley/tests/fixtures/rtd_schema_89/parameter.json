@@ -1,0 +1,361 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "/static/d/schema/89/parameter.json",
+    "meta": { "schema_version": 89, "json_filename": "parameter.json" },
+    "title": "Parameter schema",
+    "type": "object",
+    "properties": {
+        "parameter": {
+            "type": "object",
+            "required": ["id", "displayName", "kind", "description"],
+            "properties": {
+                "id": { "$ref": "dashboard.json#/$defs/uuid" },
+                "displayName": { "$ref": "dashboard.json#/$defs/populatedString" },
+                "description": {
+                    "type": "string",
+                    "description": "The description for the parameter",
+                    "errorMessage": { "type": "Expected to be a string" }
+                },
+                "kind": {
+                    "type": "string",
+                    "description": "The kind of parameter (e.g. string, long, duration, etc.)",
+                    "enum": ["string", "real", "decimal", "int", "bool", "datetime", "long", "duration", "dataSource"],
+                    "errorMessage": {
+                        "type": "\"parameters.kind\" is an Enum and expects one of the following values: [\"string\", \"int\", \"long\", \"real\", \"decimal\", \"bool\", \"datetime\", \"duration\", \"dataSource\"]"
+                    }
+                },
+                "showOnPages": {
+                    "type": "object",
+                    "description": "Controls what pages the parameter pill is shown on",
+                    "properties": {
+                        "kind": {
+                            "type": "string",
+                            "description": "When set to \"all\", this parameter will be shown on all pages, even newly created ones in the future. When set to \"selection\", this parameter is only shown on the selected pages and if none are selected then this parameter will be hidden.",
+                            "oneOf": [{ "const": "all" }, { "const": "selection" }]
+                        }
+                    },
+                    "required": ["kind"],
+                    "if": { "properties": { "kind": { "const": "selection" } } },
+                    "then": {
+                        "properties": {
+                            "pageIds": {
+                                "type": "array",
+                                "description": "An array of page IDs this parameter is shown on. If empty, then the parameter is hidden.",
+                                "items": { "$ref": "dashboard.json#/$defs/uuid" },
+                                "uniqueItems": true
+                            }
+                        },
+                        "required": ["pageIds"]
+                    },
+                    "errorMessage": { "type": "\"parameters.showOnPages\" is expected to be a object" }
+                }
+            },
+            "allOf": [
+                {
+                    "if": { "properties": { "kind": { "const": "duration" } } },
+                    "then": { "$ref": "#/$defs/durationParameter" }
+                },
+                {
+                    "if": { "properties": { "kind": { "const": "dataSource" } } },
+                    "then": {
+                        "properties": {
+                            "dataSource": { "$ref": "#/$defs/dataSource" },
+                            "defaultValue": {
+                                "type": "object",
+                                "properties": {
+                                    "kind": { "const": "dataSource" },
+                                    "dataSourceId": { "$ref": "dashboard.json#/$defs/uuid" }
+                                },
+                                "required": ["dataSourceId"]
+                            }
+                        },
+                        "required": ["dataSource", "defaultValue"]
+                    }
+                },
+                {
+                    "if": { "properties": { "kind": { "$ref": "dashboard.json#/$defs/basicParamType" } } },
+                    "then": { "$ref": "#/$defs/basicParameter" }
+                }
+            ]
+        }
+    },
+    "$defs": {
+        "dataSource": {
+            "type": "object",
+            "properties": {
+                "kind": { "const": "dataSource" },
+                "values": {
+                    "description": "The values available for a data source parameter to choose from.",
+                    "oneOf": [
+                        { "type": "object", "properties": { "kind": { "const": "all" } } },
+                        {
+                            "type": "object",
+                            "properties": {
+                                "kind": { "const": "selection" },
+                                "value": { "type": "array", "items": { "$ref": "dashboard.json#/$defs/uuid" } }
+                            }
+                        }
+                    ]
+                }
+            },
+            "required": ["kind"]
+        },
+        "durationParameter": {
+            "type": "object",
+            "required": ["defaultValue", "beginVariableName", "endVariableName"],
+            "properties": {
+                "beginVariableName": { "$ref": "dashboard.json#/$defs/variableName" },
+                "endVariableName": { "$ref": "dashboard.json#/$defs/variableName" },
+                "defaultValue": {
+                    "type": "object",
+                    "oneOf": [
+                        {
+                            "properties": {
+                                "kind": { "const": "fixed" },
+                                "start": {
+                                    "type": "number",
+                                    "description": "The duration start date in milliseconds",
+                                    "errorMessage": {
+                                        "type": "\"parameters.defaultValue.start\" is expected to be a number"
+                                    }
+                                },
+                                "end": {
+                                    "type": "number",
+                                    "description": "The duration end date in milliseconds",
+                                    "errorMessage": {
+                                        "type": "\"parameters.defaultValue.end\" is expected to be a number"
+                                    }
+                                }
+                            },
+                            "required": ["kind", "start", "end"]
+                        },
+                        {
+                            "properties": {
+                                "kind": { "const": "dynamic" },
+                                "count": {
+                                    "type": "number",
+                                    "description": "The number of units (e.g. `14`)",
+                                    "errorMessage": {
+                                        "type": "\"parameters.defaultValue.count\" is expected to be a number"
+                                    }
+                                },
+                                "unit": {
+                                    "type": "string",
+                                    "description": "The type of unit used (e.g. `days`)",
+                                    "enum": ["months", "weeks", "days", "hours", "minutes"],
+                                    "errorMessage": {
+                                        "type": "\"parameters.defaultValue.unit\" is an Enum and expects one of the following values: [\"months\", \"weeks\", \"days\", \"hours\", \"minutes\"]"
+                                    }
+                                }
+                            },
+                            "required": ["kind", "count", "unit"]
+                        }
+                    ]
+                }
+            }
+        },
+        "basicParameter": {
+            "type": "object",
+            "required": ["defaultValue", "selectionType", "variableName"],
+            "properties": {
+                "variableName": { "$ref": "dashboard.json#/$defs/variableName" },
+                "selectionType": {
+                    "type": "string",
+                    "description": "The selection type for this parameter (e.g. `single`)",
+                    "enum": ["freetext", "scalar", "array"],
+                    "errorMessage": {
+                        "type": "\"parameters.selectionType\" is an Enum and expects one of the following values: [\"freetext\", \"scalar\", \"array\"]"
+                    }
+                },
+                "defaultValue": {
+                    "type": "object",
+                    "description": "The default value for the parameter",
+                    "properties": {
+                        "kind": { "type": "string", "description": "The kind of parameter for the default value" }
+                    },
+                    "required": ["kind"],
+                    "errorMessage": {
+                        "required": "\"parameters.defaultValue\" requires the following properties to be defined: [\"kind\"]"
+                    },
+                    "oneOf": [
+                        {
+                            "properties": {
+                                "kind": { "const": "value" },
+                                "value": {
+                                    "type": ["string", "number", "boolean"],
+                                    "description": "The value of the parameter",
+                                    "errorMessage": {
+                                        "required": "\"parameters.defaultValue.value\" is expected to be one of: [\"string\", \"number\", \"boolean\"]"
+                                    }
+                                }
+                            },
+                            "required": ["value"]
+                        },
+                        {
+                            "properties": {
+                                "kind": { "const": "values" },
+                                "values": {
+                                    "type": "array",
+                                    "description": "The array of values for the parameter",
+                                    "items": {
+                                        "anyOf": [{ "type": "string" }, { "type": "number" }, { "type": "boolean" }]
+                                    },
+                                    "errorMessage": {
+                                        "type": "`parameters.defaultValue.values` expects be an array of a single type (e.g. string[] | number[] | boolean[])"
+                                    }
+                                }
+                            },
+                            "required": ["values"]
+                        },
+                        {
+                            "properties": {
+                                "kind": {
+                                    "const": "all",
+                                    "description": "Shows up as \"all\" in dropdown options. Serialized as either \"null\" or every available value depending on how \"allIsNull\" is configured."
+                                }
+                            }
+                        },
+                        {
+                            "properties": {
+                                "kind": {
+                                    "const": "no-selection",
+                                    "description": "Dependents of the parameter aren't run until a selection is made by the user"
+                                }
+                            }
+                        },
+                        {
+                            "properties": {
+                                "kind": {
+                                    "const": "query-result",
+                                    "description": "Parameter default to the first row in the first result of it'ts query"
+                                }
+                            }
+                        }
+                    ]
+                }
+            },
+            "allOf": [
+                {
+                    "if": { "properties": { "selectionType": { "const": "freetext" } } },
+                    "then": {
+                        "type": "object",
+                        "properties": {
+                            "defaultValue": { "type": "object", "properties": { "kind": { "enum": ["value", "all"] } } }
+                        }
+                    }
+                },
+                {
+                    "if": { "properties": { "selectionType": { "const": "array" } } },
+                    "then": {
+                        "properties": {
+                            "allIsNull": {
+                                "type": "boolean",
+                                "description": "If true, \"all\" selections are serialized as \"null\". If false, \"all\" is serialized as every value in dropdown"
+                            }
+                        }
+                    }
+                },
+                {
+                    "if": {
+                        "properties": {
+                            "dataSource": { "type": "object", "properties": { "kind": { "const": "static" } } }
+                        }
+                    },
+                    "then": {
+                        "not": {
+                            "properties": {
+                                "defaultValue": {
+                                    "type": "object",
+                                    "properties": { "kind": { "const": "query-result" } }
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    "if": { "properties": { "selectionType": { "enum": ["scalar", "array"] } } },
+                    "then": {
+                        "type": "object",
+                        "required": ["includeAllOption", "dataSource"],
+                        "properties": {
+                            "includeAllOption": { "type": "boolean" },
+                            "dataSource": {
+                                "type": "object",
+                                "description": "The data source for this parameter",
+                                "oneOf": [
+                                    {
+                                        "properties": {
+                                            "kind": { "type": "string", "const": "static" },
+                                            "values": {
+                                                "type": "array",
+                                                "description": "The array of data sources",
+                                                "items": {
+                                                    "type": "object",
+                                                    "required": ["value"],
+                                                    "properties": {
+                                                        "displayText": {
+                                                            "type": "string",
+                                                            "description": "The display text",
+                                                            "errorMessage": { "type": "Expected to be a string" }
+                                                        },
+                                                        "value": {
+                                                            "type": ["string", "number", "boolean"],
+                                                            "description": "The value",
+                                                            "errorMessage": {
+                                                                "type": "\"parameters.dataSource.values.value\" is expected to be one of: [\"string\", \"number\", \"boolean\"]"
+                                                            }
+                                                        }
+                                                    }
+                                                },
+                                                "errorMessage": {
+                                                    "required": "\"parameters.dataSource\" requires the following properties to be defined: [\"kind\", \"values\"]"
+                                                }
+                                            }
+                                        },
+                                        "required": ["kind", "values"],
+                                        "errorMessage": {
+                                            "required": "\"parameters.dataSource\" requires the following properties to be defined: [\"kind\", \"values\"]"
+                                        }
+                                    },
+                                    {
+                                        "properties": {
+                                            "kind": { "type": "string", "const": "query" },
+                                            "autoReset": {
+                                                "type": "boolean",
+                                                "description": "Parameter value is reset when the selection is no longer in the list of options"
+                                            },
+                                            "queryRef": { "$ref": "query.json#/$defs/queryRef" },
+                                            "columns": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "value": {
+                                                        "type": "string",
+                                                        "description": "The column value",
+                                                        "errorMessage": { "type": "Expected to be a string" }
+                                                    },
+                                                    "label": {
+                                                        "type": "string",
+                                                        "description": "The column value",
+                                                        "errorMessage": { "type": "Expected to be a string" }
+                                                    }
+                                                },
+                                                "errorMessage": {
+                                                    "type": "\"parameters.dataSource.columns.errorMessage\" is expected to be a object"
+                                                }
+                                            }
+                                        },
+                                        "required": ["kind", "queryRef", "columns"],
+                                        "errorMessage": {
+                                            "required": "\"parameters.dataSource\" is expected to be a object"
+                                        }
+                                    },
+                                    { "$ref": "#/$defs/dataSource" }
+                                ]
+                            }
+                        }
+                    }
+                }
+            ]
+        }
+    }
+}

@@ -1,0 +1,6 @@
+/// OneLake source for all Direct Lake tables (ids injected at deploy time)
+expression 'DirectLake - MVOI Lakehouse' =
+		let
+		    Source = AzureStorage.DataLake("https://onelake.dfs.fabric.microsoft.com/{{WORKSPACE_ID}}/{{LAKEHOUSE_ID}}", [HierarchicalNavigation=true])
+		in
+		    Source

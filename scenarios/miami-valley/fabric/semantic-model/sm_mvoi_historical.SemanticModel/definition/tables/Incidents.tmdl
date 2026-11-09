@@ -1,0 +1,134 @@
+/// One row per DISTINCT incident occurrence (continuous active period of one OHGO event). Repeated polling never adds rows, so counts and hot spots are not inflated.
+table Incidents
+
+	/// Distinct incident occurrences (not polls, not lifecycle updates).
+	measure 'Incident Occurrences' = COUNTROWS(Incidents)
+		formatString: #,##0
+		displayFolder: Incidents
+
+	/// Occurrences that fully closed the road at any point.
+	measure 'Road Closure Occurrences' = CALCULATE(COUNTROWS(Incidents), Incidents[Road Closure] = TRUE())
+		formatString: #,##0
+		displayFolder: Incidents
+
+	/// Total active duration of occurrences, in hours (open occurrences counted to the last run).
+	measure 'Incident Hours' = DIVIDE(SUM(Incidents[Duration Minutes]), 60)
+		formatString: #,##0.0
+		displayFolder: Incidents
+
+	/// Mean active duration of an occurrence.
+	measure 'Average Duration Minutes' = AVERAGE(Incidents[Duration Minutes])
+		formatString: #,##0.0
+		displayFolder: Incidents
+
+	/// Occurrences inside an active NWS alert area during the alert window (spatial-temporal coincidence, not proven causation).
+	measure 'Weather-Related Occurrences' = COUNTROWS(FILTER(Incidents, NOT ISEMPTY(RELATEDTABLE('Incident Weather'))))
+		formatString: #,##0
+		displayFolder: Weather
+
+	/// Share of occurrences that coincided with an NWS alert.
+	measure 'Weather-Related Share' = DIVIDE([Weather-Related Occurrences], [Incident Occurrences])
+		formatString: 0.0%
+		displayFolder: Weather
+
+	/// Occurrences per day the feed was running (days without polls are not quiet days).
+	measure 'Occurrences per Feed Day' = DIVIDE([Incident Occurrences] + 0, [Feed Days])
+		formatString: #,##0.0
+		displayFolder: Incidents
+
+	/// Baseline for 'than usual': occurrences per feed day over the 28 days before today.
+	measure 'Usual Daily Occurrences' = CALCULATE([Occurrences per Feed Day], 'Date'[Date] >= TODAY() - 28 && 'Date'[Date] < TODAY())
+		formatString: #,##0.0
+		displayFolder: Incidents
+
+	column 'Occurrence ID'
+		dataType: string
+		isKey
+		isHidden
+		summarizeBy: none
+		sourceColumn: occurrence_id
+
+	column 'Event Type'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: entity_type
+
+	column Category
+		dataType: string
+		summarizeBy: none
+		sourceColumn: category
+
+	column 'Peak Severity Rank'
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: peak_severity_rank
+
+	column 'Peak Severity'
+		dataType: string
+		summarizeBy: none
+		sortByColumn: 'Peak Severity Rank'
+		sourceColumn: peak_severity
+
+	column 'Road Closure'
+		dataType: boolean
+		summarizeBy: none
+		sourceColumn: had_road_closure
+
+	column 'Is Open'
+		dataType: boolean
+		summarizeBy: none
+		sourceColumn: is_open
+
+	column 'Start Date'
+		dataType: dateTime
+		isHidden
+		summarizeBy: none
+		sourceColumn: start_date
+
+	/// Hour of day (UTC) the occurrence began
+	column 'Start Hour'
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: start_hour
+
+	column 'Started At'
+		dataType: dateTime
+		formatString: yyyy-mm-dd hh:nn
+		summarizeBy: none
+		sourceColumn: started_at
+
+	column 'Duration Minutes'
+		dataType: double
+		isHidden
+		summarizeBy: none
+		sourceColumn: duration_minutes
+
+	column Route
+		dataType: string
+		summarizeBy: none
+		sourceColumn: route_name
+
+	column 'Corridor Key'
+		dataType: string
+		isHidden
+		summarizeBy: none
+		sourceColumn: corridor
+
+	column Latitude
+		dataType: double
+		summarizeBy: none
+		dataCategory: Latitude
+		sourceColumn: latitude
+
+	column Longitude
+		dataType: double
+		summarizeBy: none
+		dataCategory: Longitude
+		sourceColumn: longitude
+
+	partition Incidents = entity
+		mode: directLake
+		source
+			entityName: gold_incident_occurrences
+			expressionSource: 'DirectLake - MVOI Lakehouse'

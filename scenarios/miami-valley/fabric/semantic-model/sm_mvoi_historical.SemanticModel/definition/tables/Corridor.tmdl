@@ -1,0 +1,19 @@
+/// Highway corridors (configured in geography.yaml).
+table Corridor
+
+	column Corridor
+		dataType: string
+		isKey
+		summarizeBy: none
+		sourceColumn: corridor
+
+	column 'Corridor Name'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: corridor_name
+
+	partition Corridor = entity
+		mode: directLake
+		source
+			entityName: gold_corridors
+			expressionSource: 'DirectLake - MVOI Lakehouse'

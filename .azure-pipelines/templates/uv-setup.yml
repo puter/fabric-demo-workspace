@@ -1,0 +1,6 @@
+# Installs a pinned uv onto the agent PATH.
+steps:
+  - script: |
+      curl -LsSf https://astral.sh/uv/$(uvVersion)/install.sh | sh
+      echo "##vso[task.prependpath]$HOME/.local/bin"
+    displayName: Install uv $(uvVersion)

@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SD Labs · Miami Valley Live</title>
+  <link rel="icon" href="/logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Press+Start+2P&display=swap">
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <header class="bar">
+    <img class="logo" src="/logo.png" alt="SD Labs" width="44" height="43">
+    <div class="titles">
+      <h1>Miami Valley Operations Intelligence</h1>
+      <p>Live public traffic and weather around <strong>Sinclair Conference Center</strong>, Dayton</p>
+    </div>
+    <span class="pill"><span class="dot"></span>Live · Microsoft Fabric Real-Time Intelligence</span>
+    <button id="signin" class="btn" hidden>Sign in</button>
+  </header>
+
+  <main class="layout">
+    <section class="panel embed-panel" aria-label="Live dashboard">
+      <div id="embed" class="embed"></div>
+      <div id="embed-status" class="status">Signing in…</div>
+    </section>
+
+    <aside class="panel chat" aria-label="Ask the data">
+      <div class="chat-head">
+        <h2>Ask the data</h2>
+        <span class="sub">Fabric data agent · <span id="agent-name">da_mvoi</span></span>
+      </div>
+      <div id="messages" class="messages">
+        <div class="hint">
+          Ask in plain English. Each question is answered on its own (no follow-up memory)
+          and takes 10–40 seconds.
+          <div class="chips">
+            <button class="chip">Which sites have the highest disruption exposure right now?</button>
+            <button class="chip">Which corridor had the most closure hours this month?</button>
+            <button class="chip">Are any weather alerts active near Sinclair?</button>
+          </div>
+        </div>
+      </div>
+      <form id="ask" class="ask">
+        <textarea id="question" rows="2" maxlength="500" placeholder="Ask about incidents, sites, weather…" required></textarea>
+        <button class="btn" type="submit">Ask</button>
+      </form>
+      <p class="fine">Sites are real public places; SD Labs is not affiliated with them. Exposure is inferred from public data.</p>
+    </aside>
+  </main>
+
+  <script type="module" src="/app.js"></script>
+</body>
+</html>

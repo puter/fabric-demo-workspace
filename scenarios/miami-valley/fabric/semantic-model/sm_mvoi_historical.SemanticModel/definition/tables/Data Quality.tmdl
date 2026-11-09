@@ -1,0 +1,57 @@
+/// Silver data-quality rule results per run.
+table 'Data Quality'
+
+	/// Share of rule checks that passed.
+	measure 'DQ Pass Rate' = 1 - DIVIDE(SUM('Data Quality'[Rows Failed]), SUM('Data Quality'[Rows Checked]))
+		formatString: 0.00%
+		displayFolder: Data quality
+
+	/// Rows failing a rule (error rules are quarantined; warn rules are flagged).
+	measure 'DQ Failed Rows' = SUM('Data Quality'[Rows Failed])
+		formatString: #,##0
+		displayFolder: Data quality
+
+	column 'Run ID'
+		dataType: string
+		isHidden
+		summarizeBy: none
+		sourceColumn: run_id
+
+	column 'Date Key'
+		dataType: dateTime
+		isHidden
+		summarizeBy: none
+		sourceColumn: run_date
+
+	column Rule
+		dataType: string
+		summarizeBy: none
+		sourceColumn: rule
+
+	column 'Rule Severity'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: severity
+
+	column 'Rule Description'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: description
+
+	column 'Rows Checked'
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: rows_checked
+
+	column 'Rows Failed'
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: rows_failed
+
+	partition 'Data Quality' = entity
+		mode: directLake
+		source
+			entityName: silver_dq_results
+			expressionSource: 'DirectLake - MVOI Lakehouse'

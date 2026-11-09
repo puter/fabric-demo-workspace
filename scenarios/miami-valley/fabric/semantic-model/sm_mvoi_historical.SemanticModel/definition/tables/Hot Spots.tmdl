@@ -1,0 +1,76 @@
+/// Getis-Ord Gi* grid bins over distinct incident occurrences (ArcGIS FindHotSpots or fallback). Map table: plot Bin Latitude/Longitude coloured by Confidence.
+table 'Hot Spots'
+
+	/// Bins that are hot spots at 95% confidence or higher.
+	measure 'Hot Spot Bins 95' = CALCULATE(COUNTROWS('Hot Spots'), 'Hot Spots'[Confidence] >= 2)
+		formatString: #,##0
+		displayFolder: Hot spots
+
+	/// Distinct occurrences that fall inside 95%+ hot-spot bins.
+	measure 'Occurrences in Hot Spots' = CALCULATE(SUM('Hot Spots'[Occurrences in Bin]), 'Hot Spots'[Confidence] >= 2)
+		formatString: #,##0
+		displayFolder: Hot spots
+
+	column 'Bin ID'
+		dataType: string
+		isHidden
+		summarizeBy: none
+		sourceColumn: bin_id
+
+	column 'Bin Latitude'
+		dataType: double
+		summarizeBy: none
+		dataCategory: Latitude
+		sourceColumn: center_lat
+
+	column 'Bin Longitude'
+		dataType: double
+		summarizeBy: none
+		dataCategory: Longitude
+		sourceColumn: center_lon
+
+	column 'Bin WKT'
+		dataType: string
+		isHidden
+		summarizeBy: none
+		sourceColumn: bin_wkt
+
+	column 'Occurrences in Bin'
+		dataType: double
+		isHidden
+		summarizeBy: none
+		sourceColumn: value
+
+	column 'Z Score'
+		dataType: double
+		formatString: 0.00
+		summarizeBy: none
+		sourceColumn: GiZScore
+
+	column 'P Value'
+		dataType: double
+		formatString: 0.0000
+		summarizeBy: none
+		sourceColumn: GiPValue
+
+	/// +3/+2/+1 = hot spot at 99/95/90% confidence; negative = cold spot; 0 = not significant
+	column Confidence
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: Gi_Bin
+
+	column Weighting
+		dataType: string
+		summarizeBy: none
+		sourceColumn: weighting
+
+	column 'Spatial Engine'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: spatial_engine
+
+	partition 'Hot Spots' = entity
+		mode: directLake
+		source
+			entityName: gold_hotspots
+			expressionSource: 'DirectLake - MVOI Lakehouse'

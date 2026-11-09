@@ -1,0 +1,80 @@
+/// Poller health per source per day (from heartbeats).
+table 'Pipeline Health'
+
+	/// Share of source polls that succeeded.
+	measure 'Poll Success Rate' = 1 - DIVIDE(SUM('Pipeline Health'[Failed Polls]), SUM('Pipeline Health'[Polls]))
+		formatString: 0.00%
+		displayFolder: Pipeline
+
+	/// Source polls executed.
+	measure 'Total Polls' = SUM('Pipeline Health'[Polls])
+		formatString: #,##0
+		displayFolder: Pipeline
+
+	/// Days in context on which the poller ran.
+	measure 'Feed Days' = COUNTROWS(FILTER(VALUES('Date'[Date]), [Total Polls] > 0))
+		formatString: #,##0
+		displayFolder: Pipeline
+
+	/// Source records rejected by schema/coordinate validation in the poller.
+	measure 'Rejected Record Rate' = DIVIDE(SUM('Pipeline Health'[Rejected Records]), SUM('Pipeline Health'[Observations]) + SUM('Pipeline Health'[Rejected Records]))
+		formatString: 0.00%
+		displayFolder: Pipeline
+
+	/// Worst daily p95 from poll to Eventhouse ingestion in context.
+	measure 'P95 End to End Latency Seconds' = MAX('Pipeline Health'[P95 End to End Seconds])
+		formatString: #,##0.0
+		displayFolder: Pipeline
+
+	column 'Date Key'
+		dataType: dateTime
+		isHidden
+		summarizeBy: none
+		sourceColumn: date
+
+	column Source
+		dataType: string
+		summarizeBy: none
+		sourceColumn: source
+
+	column Polls
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: polls
+
+	column 'Failed Polls'
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: failed_polls
+
+	column Observations
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: observations
+
+	column 'Rejected Records'
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: rejected
+
+	column 'P95 Source Latency ms'
+		dataType: double
+		isHidden
+		summarizeBy: none
+		sourceColumn: p95_source_latency_ms
+
+	column 'P95 End to End Seconds'
+		dataType: double
+		isHidden
+		summarizeBy: none
+		sourceColumn: p95_end_to_end_s
+
+	partition 'Pipeline Health' = entity
+		mode: directLake
+		source
+			entityName: gold_pipeline_health_daily
+			expressionSource: 'DirectLake - MVOI Lakehouse'
